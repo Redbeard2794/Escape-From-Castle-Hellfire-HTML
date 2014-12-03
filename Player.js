@@ -1,9 +1,9 @@
 function Player()
 {
-	this.x = 30;
-	this.y = 200;
-	this.width = 30;
-	this.height = 140;
+	this.x = 0;
+	this.y = 0;
+	//this.width = 30;
+	//this.height = 140;
 
 	this.spriteSheet = new Image();
 	this.spriteSheet.src = 'textures/PlayerRightFixed.png';
@@ -29,6 +29,6 @@ Player.prototype.draw = function()
 	game.ctx.fillStyle = rgb(r,g,b);
 
 	//parameters are x,y,width,height
-	game.ctx.fillRect(this.x,this.y,this.width,this.height);
-	game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, 200, 149, this.playerX, this.playerY, 200, 150);
+	//game.ctx.fillRect(this.x,this.y,this.width,this.height);
+	game.ctx.drawImage(this.spriteSheet, this.x, this.y, 45, 81, this.playerX, this.playerY, 45, 81);
 }

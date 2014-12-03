@@ -106,13 +106,13 @@ function keyDownHandler(e)
 
 	if(e.keyCode == "87")//up 38, 87
 		{
-			game.Paddle1.moveUp();
+			//game.Paddle1.moveUp();
 			//console.log("W detected");
 		}
 
 	if(e.keyCode == "83")//down 40, 83
 		{
-			game.Paddle1.moveDown();
+			//game.Paddle1.moveDown();
 			//console.log("S detected");
 		}
 }
@@ -135,7 +135,7 @@ Game.prototype.draw = function()
 	this.ctx.fillText("Welcome to Castle Hellfire!",0,30);
 	//this.ctx.fillText("Computer",883,75);
 	//this.ctx.fillText(this.humanScore + " - " + this.computerScore, this.screenWidth/2-27, this.screenHeight/2+23)
-	game.player.draw();
+	
 
 	//touches is an array that holds all the touch info
 	//use it e.g. draw a circle around each finger
@@ -151,6 +151,8 @@ Game.prototype.draw = function()
     	this.ctx.arc(touch.clientX, touch.clientY, 40, 0, Math.PI*2, true);
     	this.ctx.stroke();
 	}
+
+	game.player.draw();
 
 }
 
