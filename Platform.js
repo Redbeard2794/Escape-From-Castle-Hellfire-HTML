@@ -1,0 +1,37 @@
+function Platform(posX,posY)
+{
+    this.Sprite = new Image();
+    this.Sprite.src = "textures/plat1.png"
+
+	this.fixDef = new b2FixtureDef;
+	this.fixDef.density = 1.0;
+	this.fixDef.friction = 0.5;
+	this.fixDef.restitution = 0.2;
+	
+	this.bodyDef = new b2BodyDef;
+	this.bodyDef.type = b2Body.b2_staticBody;
+
+	this.fixDef.shape = new b2PolygonShape;
+	this.fixDef.shape.SetAsBox(40, 20);
+
+	this.bodyDef.position.x = posX;
+	this.bodyDef.position.y = posY;
+
+    this.body = game.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
+}
+
+Platform.prototype.update = function()
+{
+
+}
+
+Platform.prototype.draw = function()
+{
+    var pos = this.body.GetBody().GetPosition();
+    var angle = this.body.GetBody().GetAngle();
+    game.ctx.save();
+    game.ctx.translate(pos.x, pos.y);
+    game.ctx.rotate(angle);
+    game.ctx.drawImage(this.Sprite, -25, -25);
+    game.ctx.restore();
+}

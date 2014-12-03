@@ -22,13 +22,7 @@ Player.prototype.update = function()
 
 Player.prototype.draw = function()
 {
-	var r = 0;
-	var g = 255;
-	var b = 0;
-
-	game.ctx.fillStyle = rgb(r,g,b);
-
 	//parameters are x,y,width,height
 	//game.ctx.fillRect(this.x,this.y,this.width,this.height);
-	game.ctx.drawImage(this.spriteSheet, this.x, this.y, 45, 81, this.playerX, this.playerY, 45, 81);
+	game.ctx.drawImage(this.spriteSheet, this.x, this.y, 45, 73, this.playerX, this.playerY, 45, 73);
 }
