@@ -6,8 +6,8 @@ function Player()
 	this.spriteSheet = new Image();
 	this.spriteSheet.src = 'textures/PlayerRightFixed.png';
 
-	this.SpriteWidth = 40;
-	this.SpriteHeight = 20;
+	this.SpriteWidth = 45;
+	this.SpriteHeight = 73;
 
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 1.0;
@@ -35,9 +35,13 @@ Player.prototype.update = function()
 Player.prototype.move = function(key)
 {
     var pos = this.body.GetBody().GetPosition();
-    if (key == 'up')
+    if (key == 'up') {
+        pos.y -= 5;
+        this.body.GetBody().SetPosition(pos);
+    }
+    else if (key == 'down')
     {
-        pos.y += 30;
+        pos.y += 5;
         this.body.GetBody().SetPosition(pos);
     }
 }
@@ -52,7 +56,7 @@ Player.prototype.draw = function()
     var pos = this.body.GetBody().GetPosition();
     var angle = this.body.GetBody().GetAngle();
     game.ctx.save();
-    game.ctx.translate(pos.x, pos.y);
+    //game.ctx.translate(pos.x, pos.y);
     game.ctx.rotate(angle);
     game.ctx.drawImage(this.spriteSheet, 0, 0, 45, 73, pos.x, pos.y, 45, 73);
     game.ctx.restore();

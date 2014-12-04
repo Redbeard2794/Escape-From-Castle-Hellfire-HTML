@@ -42,7 +42,6 @@ function init() {
 
     game.world = new b2World(new b2Vec2(0, 10), true);
 
-
     var fixDef = new b2FixtureDef;
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
@@ -56,8 +55,9 @@ function init() {
     bodyDef.userData = 'ground';
     fixDef.shape = new b2PolygonShape;
 
-    fixDef.shape.SetAsBox((600 / SCALE) / 2, (10 / SCALE) / 2);
+    fixDef.shape.SetAsBox((game.screenWidth / SCALE) / 2, (10 / SCALE) / 2);
     game.world.CreateBody(bodyDef).CreateFixture(fixDef);
+    
 
 }; // init()
 function Game() {
@@ -69,6 +69,7 @@ function Game() {
     //initializations
     this.initCanvas();
     this.initTouch();
+
 }
 Game.prototype.addContactListener = function (callbacks) {
     var listener = new Box2D.Dynamics.b2ContactListener;
@@ -120,6 +121,7 @@ Game.prototype.update = function () {
       , 10       //velocity iterations
 	  , 10       //position iterations
 	  );
+    
     game.world.ClearForces();
     game.draw();
     requestAnimFrame(game.update);
@@ -153,12 +155,12 @@ Game.prototype.draw = function () {
         this.ctx.arc(touch.clientX, touch.clientY, 40, 0, Math.PI * 2, true);
         this.ctx.stroke();
     }
-
     game.player.draw();
 
     for (var i = 0; i < game.numPlatforms; i++) {
         game.platforms[i].draw();
     }
+    
 
 }
 
@@ -178,14 +180,13 @@ function onTouchEnd(e) {
 
 function keyDownHandler(e) {
 
-    if (e.keyCode == "87")//up 38, 87
+    if (e.keyCode == "87")//up 38, 87 w
     {
-        game.player.update('up')
+        game.player.move('up');
     }
-
-    if (e.keyCode == "83")//down 40, 83
+    if (e.keyCode == "83")//down 40, 83 s
     {
-
+        game.player.move('down');
     }
 }
 
