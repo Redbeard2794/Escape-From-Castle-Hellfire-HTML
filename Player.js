@@ -35,14 +35,12 @@ Player.prototype.update = function()
 Player.prototype.move = function(key)
 {
     var pos = this.body.GetBody().GetPosition();
-    if (key == 'up') {
-        pos.y -= 5;
-        this.body.GetBody().SetPosition(pos);
-    }
-    else if (key == 'down')
+    if( key == 'right')
     {
-        pos.y += 5;
-        this.body.GetBody().SetPosition(pos);
+        this.body.GetBody().ApplyImpulse(.5, b2Vec2(1,0));
+    }
+    if ( key == 'left') {
+        this.body.GetBody().ApplyImpulse(1, pos);
     }
 }
 
@@ -55,10 +53,10 @@ Player.prototype.draw = function()
 {
     var pos = this.body.GetBody().GetPosition();
     var angle = this.body.GetBody().GetAngle();
+
     game.ctx.save();
-    //game.ctx.translate(pos.x, pos.y);
     game.ctx.rotate(angle);
-    game.ctx.drawImage(this.spriteSheet, 0, 0, 45, 73, pos.x, pos.y, 45, 73);
+    game.ctx.drawImage(this.spriteSheet, 0, 0, 45, 73, pos.x - (this.SpriteWidth /2), pos.y - (this.SpriteHeight /2), 45, 73);
     game.ctx.restore();
 	
 }

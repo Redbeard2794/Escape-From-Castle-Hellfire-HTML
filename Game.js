@@ -7,8 +7,6 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30;
 
-
-
 function main() {
     game = new Game();
     init(); //initalize Box2D world (all object creation must be done after this)
@@ -155,12 +153,12 @@ Game.prototype.draw = function () {
         this.ctx.arc(touch.clientX, touch.clientY, 40, 0, Math.PI * 2, true);
         this.ctx.stroke();
     }
-    game.player.draw();
+    
 
     for (var i = 0; i < game.numPlatforms; i++) {
         game.platforms[i].draw();
     }
-    
+    game.player.draw();
 
 }
 
@@ -180,13 +178,13 @@ function onTouchEnd(e) {
 
 function keyDownHandler(e) {
 
-    if (e.keyCode == "87")//up 38, 87 w
+    if (e.keyCode == "68")//up 38, 87 w
     {
-        game.player.move('up');
+        game.player.move('right');
     }
-    if (e.keyCode == "83")//down 40, 83 s
+    if (e.keyCode == "65")//down 40, 83 s
     {
-        game.player.move('down');
+        game.player.move('left');
     }
 }
 
