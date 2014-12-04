@@ -2,6 +2,8 @@ function Platform(posX,posY)
 {
     this.Sprite = new Image();
     this.Sprite.src = "textures/plat1.png"
+    this.SpriteWidth = 40;
+    this.SpriteHeight = 20;
 
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 1.0;
@@ -10,9 +12,10 @@ function Platform(posX,posY)
 	
 	this.bodyDef = new b2BodyDef;
 	this.bodyDef.type = b2Body.b2_staticBody;
-
+	this.bodyDef.userData = 'platform'
+	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(40, 20);
+	this.fixDef.shape.SetAsBox(this.SpriteWidth /2, this.SpriteHeight /2);
 
 	this.bodyDef.position.x = posX;
 	this.bodyDef.position.y = posY;
@@ -20,6 +23,10 @@ function Platform(posX,posY)
     this.body = game.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
 }
 
+Platform.prototype.hit = function(impulse,entity)
+{
+
+}
 Platform.prototype.update = function()
 {
 
@@ -32,6 +39,6 @@ Platform.prototype.draw = function()
     game.ctx.save();
     game.ctx.translate(pos.x, pos.y);
     game.ctx.rotate(angle);
-    game.ctx.drawImage(this.Sprite, -25, -25);
+    game.ctx.drawImage(this.Sprite, this.SpriteWidth /2 ,this.SpriteHeight /2 );
     game.ctx.restore();
 }

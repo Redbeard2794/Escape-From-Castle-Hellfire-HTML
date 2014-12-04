@@ -7,11 +7,42 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30;
 
+
+
+function main() {
+    game = new Game();
+    init(); //initalize Box2D world (all object creation must be done after this)
+    //listeners
+
+    game.numPlatforms = 10;
+
+    game.player = new Player();
+
+    game.platforms = [];
+    for (var i = 0; i < game.numPlatforms; i++) {
+        game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
+    }
+    document.addEventListener("keydown", keyDownHandler, true);
+
+    game.addContactListener(
+        {
+            BeginContact: function (idA, idB) {
+            },
+
+            PostSolve: function (bodyA, bodyB, impulse) {
+                if (impulse < 0.1) return; // playing with thresholds
+                bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
+                bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
+            }
+        });
+
+    requestAnimFrame(game.update); //kickoff the update cycle
+}
 function init() {
 
     game.world = new b2World(new b2Vec2(0, 10), true);
 
-    
+
     var fixDef = new b2FixtureDef;
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
@@ -21,25 +52,14 @@ function init() {
     bodyDef.type = b2Body.b2_staticBody;
     // positions the center of the object (not upper left!)
     bodyDef.position.x = game.screenWidth / 2 / SCALE;
-    bodyDef.position.y = game.screenHeight / SCALE;
+    bodyDef.position.y = 15;
+    bodyDef.userData = 'ground';
     fixDef.shape = new b2PolygonShape;
-    // half width, half height. eg actual height here is 1 unit
+
     fixDef.shape.SetAsBox((600 / SCALE) / 2, (10 / SCALE) / 2);
     game.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
 }; // init()
-
-function main() {
-    game = new Game();
-    init(); //initalize Box2D world (all object creation must be done after this)
-    //listeners
-    document.addEventListener("keydown", keyDownHandler, true);
-
-   
-    game.player = new Player();
-    game.plat = new Platform(20, 20);
-    requestAnimFrame(game.update); //kickoff the update cycle
-}
 function Game() {
     this.screenWidth = window.innerWidth;
     this.screenHeight = window.innerHeight;
@@ -50,7 +70,23 @@ function Game() {
     this.initCanvas();
     this.initTouch();
 }
-
+Game.prototype.addContactListener = function (callbacks) {
+    var listener = new Box2D.Dynamics.b2ContactListener;
+    if (callbacks.BeginContact) listener.BeginContact = function (contact) {
+        callbacks.BeginContact(contact.GetFixtureA().GetBody().GetUserData(),
+                               contact.GetFixtureB().GetBody().GetUserData());
+    }
+    if (callbacks.EndContact) listener.EndContact = function (contact) {
+        callbacks.EndContact(contact.GetFixtureA().GetBody().GetUserData(),
+                             contact.GetFixtureB().GetBody().GetUserData());
+    }
+    if (callbacks.PostSolve) listener.PostSolve = function (contact, impulse) {
+        callbacks.PostSolve(contact.GetFixtureA().GetBody(),
+                             contact.GetFixtureB().GetBody(),
+                             impulse.normalImpulses[0]);
+    }
+    this.world.SetContactListener(listener);
+}
 Game.prototype.initCanvas = function () {
     //create a canvas element
     this.canvas = document.createElement('canvas');
@@ -119,7 +155,10 @@ Game.prototype.draw = function () {
     }
 
     game.player.draw();
-    game.plat.draw();
+
+    for (var i = 0; i < game.numPlatforms; i++) {
+        game.platforms[i].draw();
+    }
 
 }
 
@@ -141,7 +180,7 @@ function keyDownHandler(e) {
 
     if (e.keyCode == "87")//up 38, 87
     {
-
+        game.player.update('up')
     }
 
     if (e.keyCode == "83")//down 40, 83
