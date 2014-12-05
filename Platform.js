@@ -2,7 +2,7 @@ function Platform(posX,posY)
 {
     this.Sprite = new Image();
     this.Sprite.src = "textures/plat1.png"
-    this.SpriteWidth = ;
+    this.SpriteWidth = 40;
     this.SpriteHeight = 8;
 
 	this.fixDef = new b2FixtureDef;
