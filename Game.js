@@ -128,7 +128,8 @@ Game.prototype.update = function () {
 	  );
 
         game.world.ClearForces();
-    } 
+    }
+    game.player.update();
     game.draw();
     requestAnimFrame(game.update);
 }
