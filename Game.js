@@ -7,6 +7,9 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30;
 
+var MENU = 1, GAME = 2;
+var gameState;
+
 function main() {
     game = new Game();
     init(); //initalize Box2D world (all object creation must be done after this)
@@ -33,6 +36,8 @@ function main() {
                 bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
             }
         });
+
+    gameState = GAME;
 
     requestAnimFrame(game.update); //kickoff the update cycle
 }
@@ -114,13 +119,16 @@ Game.prototype.initTouch = function () {
 }
 
 Game.prototype.update = function () {
-    game.world.Step(
+    if (gameState == GAME)
+    {
+        game.world.Step(
          1 / 60   //frame-rate
       , 10       //velocity iterations
 	  , 10       //position iterations
 	  );
-    
-    game.world.ClearForces();
+
+        game.world.ClearForces();
+    } 
     game.draw();
     requestAnimFrame(game.update);
 }
@@ -128,16 +136,6 @@ Game.prototype.update = function () {
 Game.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
 
-    //for rgb values
-    var r = 128;
-    var g = 0;
-    var b = 0;
-
-    this.ctx.fillStyle = rgb(r, g, b);
-    this.ctx.font = "30px Arial";
-    this.ctx.fillText("Welcome to Castle Hellfire!", 0, 30);
-    //this.ctx.fillText("Computer",883,75);
-    //this.ctx.fillText(this.humanScore + " - " + this.computerScore, this.screenWidth/2-27, this.screenHeight/2+23)
 
 
     //touches is an array that holds all the touch info
@@ -154,11 +152,17 @@ Game.prototype.draw = function () {
         this.ctx.stroke();
     }
     
-
-    for (var i = 0; i < game.numPlatforms; i++) {
-        game.platforms[i].draw();
+    if (gameState == GAME)
+    {
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].draw();
+        }
+        game.player.draw();
     }
-    game.player.draw();
+    else 
+    {
+
+    }
 
 }
 
@@ -178,11 +182,11 @@ function onTouchEnd(e) {
 
 function keyDownHandler(e) {
 
-    if (e.keyCode == "68")//up 38, 87 w
+    if (e.keyCode == "68")//up 38, 87 D
     {
         game.player.move('right');
     }
-    if (e.keyCode == "65")//down 40, 83 s
+    if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
     }

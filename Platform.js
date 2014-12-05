@@ -2,8 +2,8 @@ function Platform(posX,posY)
 {
     this.Sprite = new Image();
     this.Sprite.src = "textures/plat1.png"
-    this.SpriteWidth = 35;
-    this.SpriteHeight = 6;
+    this.SpriteWidth = ;
+    this.SpriteHeight = 8;
 
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 1.0;
@@ -36,8 +36,12 @@ Platform.prototype.draw = function()
 {
     var pos = this.body.GetBody().GetPosition();
     var angle = this.body.GetBody().GetAngle();
+
     game.ctx.save();
+    game.ctx.translate(pos.x, pos.y);
     game.ctx.rotate(angle);
-    game.ctx.drawImage(this.Sprite ,pos.x - (this.SpriteWidth /2),pos.y - (this.SpriteHeight /2), this.SpriteWidth ,this.SpriteHeight );
+    var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
+    game.ctx.scale(scale, scale);
+    game.ctx.drawImage(this.Sprite , -scale.x,-scale.y, this.SpriteWidth ,this.SpriteHeight );
     game.ctx.restore();
 }
