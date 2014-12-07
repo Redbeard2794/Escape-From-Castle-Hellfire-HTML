@@ -7,18 +7,17 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30;
 
-var MENU = 1, GAME = 2;
+var SPLASH = 0, MENU = 1, GAME = 2;
 var gameState;
 
 function main() {
     game = new Game();
     init(); //initalize Box2D world (all object creation must be done after this)
     //listeners
-
+    game.menu = new Menu();
     game.numPlatforms = 10;
-
+    loadLevel();
     game.player = new Player();
-
     game.platforms = [];
     for (var i = 0; i < game.numPlatforms; i++) {
         game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
@@ -38,9 +37,32 @@ function main() {
         });
 
     gameState = GAME;
+    //stuff for UI(May move it somewhere else after)
+    game.jumpButton = new Image();
+    game.jumpButton.src = 'textures/JumpButton.png';
+    game.leftArrow = new Image();
+    game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
+    game.rightArrow = new Image();
+    game.rightArrow.src = 'textures/SourceArrowTQ.png';
 
     requestAnimFrame(game.update); //kickoff the update cycle
 }
+
+function loadLevel()
+{
+    if (window.XMLHttpRequest) {
+        xhttp = new XMLHttpRequest();
+    }
+    else // code for IE5 and IE6
+    {
+        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xhttp.open("GET", "levels/level1.xml", false);
+    xhttp.send();
+    xmlDoc = xhttp.responseXML;
+}
+
 function init() {
 
     game.world = new b2World(new b2Vec2(0, 10), true);
@@ -159,10 +181,13 @@ Game.prototype.draw = function () {
             game.platforms[i].draw();
         }
         game.player.draw();
+        this.ctx.drawImage(game.jumpButton, 250, 300, 298, 57);
+        this.ctx.drawImage(game.leftArrow, 0, 300, 178, 84);
+        this.ctx.drawImage(game.rightArrow, 500, 300, 178, 84);
     }
-    else 
+    else if(gameState == MENU)
     {
-
+        game.menu.draw();
     }
 
 }

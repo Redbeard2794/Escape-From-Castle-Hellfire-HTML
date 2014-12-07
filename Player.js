@@ -17,7 +17,7 @@ function Player()
     //current sprite
     this.currentSprite = this.spriteSheet;
     this.idle = true;
-    this.right = true;
+    this.right = false;
 
 	this.SpriteWidth = 50;
 	this.SpriteHeight = 72;
@@ -45,7 +45,8 @@ function Player()
 	this.updateSprite1 = 0;
 	this.sx = 0;
 	this.sy = 0;
-
+	this.moving = false;
+	this.prevX = this.body.GetBody().GetPosition();
 }
 Player.prototype.update = function()
 {
@@ -57,11 +58,27 @@ Player.prototype.update = function()
         this.prevTime = this.currTime;
     //sprite sheet 1
     this.updateSprite1 += this.delta;
-    if (this.updateSprite1 > 150) {
-        this.sx += 50;
-        if (this.sx >= 400)
-            this.sx = 0;
-        this.updateSprite1 = 0;
+    if (this.idle == false) {
+        this.SpriteWidth = 50;
+        this.SpriteHeight = 72;
+        if (this.updateSprite1 > 150) {
+            this.sx += 50;
+            if (this.sx >= 400)
+                this.sx = 0;
+            this.updateSprite1 = 0;
+        }
+    }
+    else if (this.idle == true)
+    {
+        this.SpriteWidth = 42;
+        this.SpriteHeight = 75;
+        if(this.updateSprite1 > 150)
+        {
+            this.sx += 42;
+            if (this.sx >= 672)
+                this.sx = 0;
+            this.updateSprite1 = 0;
+        }
     }
 
     if(this.idle == true && this.right == true)
@@ -72,6 +89,11 @@ Player.prototype.update = function()
     {
         this.currentSprite = this.spriteSheetLeftIdle;
     }
+    if (this.moving == true)
+        this.idle = false;
+    else this.idle = true;
+    //console.log("moving "+this.moving)
+    //console.log("idle "+this.idle);
 }
 
 Player.prototype.move = function(key)
@@ -80,9 +102,9 @@ Player.prototype.move = function(key)
     body = this.body.GetBody();
     if (key == 'right') {
         this.right = true;
+        this.moving = true;
         this.idle = false;
         this.currentSprite = this.spriteSheet;
-        //this.spriteSheet.src = 'textures/PlayerRightFinal.png';
         if (body.IsAwake() == false) {
             body.SetAwake(true);
         }
@@ -92,16 +114,17 @@ Player.prototype.move = function(key)
     }
     else if (key == 'left') {
         this.right = false;
+        this.moving = true;
         this.idle = false;
         this.currentSprite = this.spriteSheetLeftWalk;
-        //this.spriteSheet.src = 'textures/PlayerLeftFinal.png';
         if (body.IsAwake() == false) {
             body.SetAwake(true);
         }
         pos.x -= 5;
         body.SetPosition(pos);
     }
-    else this.idle = true;
+    //else this.idle = true;
+    
 }
 
 Player.prototype.hit = function(impulse, entity)
@@ -119,13 +142,13 @@ Player.prototype.draw = function()
     game.ctx.rotate(angle);
     var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
     game.ctx.scale(scale, scale);
-    if(this.currentSprite == this.spriteSheet)
+    if(this.currentSprite == this.spriteSheet && this.idle == false)
         game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
-    else if (this.currentSprite == this.spriteSheetLeftWalk)
+    else if (this.currentSprite == this.spriteSheetLeftWalk && this.idle == false)
         game.ctx.drawImage(this.spriteSheetLeftWalk, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
-    else if (this.currentSprite == this.spriteSheetRightIdle)
+    else if (this.currentSprite == this.spriteSheetRightIdle && this.idle == true)
         game.ctx.drawImage(this.spriteSheetRightIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
-    else if (this.currentSprite == this.spriteSheetLeftIdle)
+    else if (this.currentSprite == this.spriteSheetLeftIdle && this.idle == true)
         game.ctx.drawImage(this.spriteSheetLeftIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
     game.ctx.restore();
 	
