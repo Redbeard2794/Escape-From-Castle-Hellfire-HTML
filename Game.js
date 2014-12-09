@@ -50,17 +50,57 @@ function main() {
 
 function loadLevel()
 {
-    if (window.XMLHttpRequest) {
-        xhttp = new XMLHttpRequest();
-    }
-    else // code for IE5 and IE6
-    {
-        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
+    //if (window.XMLHttpRequest) {
+    //    xhttp = new XMLHttpRequest();
+    //}
+    //else // code for IE5 and IE6
+    //{
+    //    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    //}
 
-    xhttp.open("GET", "levels/level1.xml", false);
-    xhttp.send();
-    xmlDoc = xhttp.responseXML;
+    //xhttp.open("GET", "levels/level1.xml", false);
+    //xhttp.send();
+    //xmlDoc = xhttp.responseXML;
+    //txt = "<bookstore><book>";
+    //txt = txt + "<title>Everyday Italian</title>";
+    //txt = txt + "<author>Giada De Laurentiis</author>";
+    //txt = txt + "<year>2005</year>";
+    //txt = txt + "</book></bookstore>";
+    txt = "<level1>";
+    txt = txt + "<Platform>"
+    txt = txt + "<x>50</x>";
+    txt = txt + "<y>50</y>";
+    txt = txt + "</Platform>"
+    txt = txt + "<Platform>"
+    txt = txt + "<x>200</x>";
+    txt = txt + "<y>50</y>";
+    txt = txt + "</Platform>"
+    txt = txt + "</level1>";
+
+
+
+    if (window.DOMParser) {
+        parser = new DOMParser();
+        xmlDoc = parser.parseFromString(txt, "text/xml");
+        //console.log(txt.split('<bookstore>',20));
+        //var cxvdsf = (txt.lastIndexOf('x'));
+        //console.log(cxvdsf);
+        //console.log(txt[cxvdsf]);
+        //console.log(txt.indexOf('x'));
+        console.log(txt[21] + txt[22]);
+        var test = 0;
+        var xmlX = txt[60] + txt[61] + txt[62];
+        test = xmlX;
+        console.log(test);
+        
+    }
+    else // Internet Explorer
+    {
+        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+        xmlDoc.async = false;
+        xmlDoc.loadXML(txt);
+        console.log(txt.length);
+    }
 }
 
 function init() {
