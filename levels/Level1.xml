@@ -3,13 +3,13 @@
 	<Platform>
 		<x>50</x>
 		<y>50</y>
-		<width>2005</width>
+		<width>205</width>
 		<height>30.00</height>
 	</Platform>
 	<Platform>
 		<x>200</x>
 		<y>50</y>
-		<width>2005</width>
+		<width>205</width>
 		<height>30.00</height>
 	</Platform>
 </Level>

@@ -15,13 +15,19 @@ function main() {
     init(); //initalize Box2D world (all object creation must be done after this)
     //listeners
     game.menu = new Menu();
-    game.numPlatforms = 10;
-    loadLevel();
+    game.numPlatforms = 20;
     game.player = new Player();
     game.platforms = [];
-    for (var i = 0; i < game.numPlatforms; i++) {
-        game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
-    }
+    //load the platforms(for now)
+    loadLevel();
+    //audio
+    //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
+    game.audio = document.createElement("audio");
+    game.audio.src = "sounds/wilhelmScream.ogg";
+
+    //for (var i = 0; i < game.numPlatforms; i++) {
+    //    game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
+    //}
     document.addEventListener("keydown", keyDownHandler, true);
 
     game.addContactListener(
@@ -45,11 +51,132 @@ function main() {
     game.rightArrow = new Image();
     game.rightArrow.src = 'textures/SourceArrowTQ.png';
 
+    game.background = new Image();
+    game.background.src = 'textures/level1Background.png';
+
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
-function loadLevel()
+function loadLevel(plats)
 {
+    txt = "<level1>";
+    txt = txt + "<Platform>"
+    txt = txt + "<x>120</x>";
+    txt = txt + "<y>315</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>250</x>";
+    txt = txt + "<y>315</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>400</x>";
+    txt = txt + "<y>315</y>";
+    txt = txt + "</Platform>"
+
+    //txt = txt + "<Platform>"
+    //txt = txt + "<x>450</x>";
+    //txt = txt + "<y>200</y>";
+    //txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>480</x>";
+    txt = txt + "<y>240</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>560</x>";
+    txt = txt + "<y>160</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>420</x>";
+    txt = txt + "<y>80</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>640</x>";
+    txt = txt + "<y>60</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>780</x>";
+    txt = txt + "<y>60</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>920</x>";
+    txt = txt + "<y>60</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1060</x>";
+    txt = txt + "<y>140</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1200</x>";
+    txt = txt + "<y>220</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1340</x>";
+    txt = txt + "<y>140</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1480</x>";
+    txt = txt + "<y>300</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1620</x>";
+    txt = txt + "<y>340</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1480</x>";
+    txt = txt + "<y>300</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1760</x>";
+    txt = txt + "<y>340</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>1900</x>";
+    txt = txt + "<y>340</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>2040</x>";
+    txt = txt + "<y>260</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>2180</x>";
+    txt = txt + "<y>140</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>2320</x>";
+    txt = txt + "<y>60</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>2460</x>";
+    txt = txt + "<y>140</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "<Platform>"
+    txt = txt + "<x>2700</x>";
+    txt = txt + "<y>315</y>";
+    txt = txt + "</Platform>"
+
+    txt = txt + "</level1>";
+
     //if (window.XMLHttpRequest) {
     //    xhttp = new XMLHttpRequest();
     //}
@@ -57,52 +184,34 @@ function loadLevel()
     //{
     //    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
     //}
-
-    //xhttp.open("GET", "levels/level1.xml", false);
+    //xhttp.open("GET", "levels/Level1.xml");
     //xhttp.send();
     //xmlDoc = xhttp.responseXML;
-    //txt = "<bookstore><book>";
-    //txt = txt + "<title>Everyday Italian</title>";
-    //txt = txt + "<author>Giada De Laurentiis</author>";
-    //txt = txt + "<year>2005</year>";
-    //txt = txt + "</book></bookstore>";
-    txt = "<level1>";
-    txt = txt + "<Platform>"
-    txt = txt + "<x>50</x>";
-    txt = txt + "<y>50</y>";
-    txt = txt + "</Platform>"
-    txt = txt + "<Platform>"
-    txt = txt + "<x>200</x>";
-    txt = txt + "<y>50</y>";
-    txt = txt + "</Platform>"
-    txt = txt + "</level1>";
 
-
-
-    if (window.DOMParser) {
-        parser = new DOMParser();
-        xmlDoc = parser.parseFromString(txt, "text/xml");
-        //console.log(txt.split('<bookstore>',20));
-        //var cxvdsf = (txt.lastIndexOf('x'));
-        //console.log(cxvdsf);
-        //console.log(txt[cxvdsf]);
-        //console.log(txt.indexOf('x'));
-        console.log(txt[21] + txt[22]);
-        var test = 0;
-        var xmlX = txt[60] + txt[61] + txt[62];
-        test = xmlX;
-        console.log(test);
-        
-    }
-    else // Internet Explorer
+    for (var i = 0; i < game.numPlatforms; i++)
     {
-        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-        xmlDoc.async = false;
-        xmlDoc.loadXML(txt);
-        console.log(txt.length);
+        var x;
+        var y;
+        //var pla;
+        if (window.DOMParser)
+        {
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(txt, "text/xml");
+            x = xmlDoc.getElementsByTagName("x")[i].childNodes[0].nodeValue;
+            y = xmlDoc.getElementsByTagName("y")[i].childNodes[0].nodeValue;
+            //console.log(x, y);
+            game.platforms[game.platforms.length] = new Platform(x,y);
+        }
+        else // Internet Explorer
+        {
+            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+            xmlDoc.async = false;
+            xmlDoc.loadXML(txt);
+            console.log(txt.length);
+        }
     }
-}
 
+}
 function init() {
 
     game.world = new b2World(new b2Vec2(0, 10), true);
@@ -193,6 +302,24 @@ Game.prototype.update = function () {
 		game.player.update();
     }
 	game.draw();
+
+    //for (var i = 0; i < this.touches.length; i++) {
+    //    var touch = this.touches[i];
+    //    if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        game.player.move('left');
+    //        console.log("Left arrow touched");
+    //    }
+    //    else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        game.player.move('right');
+    //        console.log("Right arrow touched");
+    //    }
+    //    else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        //MAKE THE PLAYER JUMPY JUMP
+    //    }
+    //}
     requestAnimFrame(game.update);
 }
 
@@ -217,13 +344,14 @@ Game.prototype.draw = function () {
     
     if (gameState == GAME)
     {
+        this.ctx.drawImage(game.background, -200, 0, 3500, 480);
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
         }
         game.player.draw();
-        this.ctx.drawImage(game.jumpButton, 250, 300, 298, 57);
-        this.ctx.drawImage(game.leftArrow, 0, 300, 178, 84);
-        this.ctx.drawImage(game.rightArrow, 500, 300, 178, 84);
+        this.ctx.drawImage(game.jumpButton, 190, 410, 298, 57);
+        this.ctx.drawImage(game.leftArrow, 0, 395, 178, 84);
+        this.ctx.drawImage(game.rightArrow, 500, 395, 178, 84);
     }
     else if(gameState == MENU)
     {
@@ -240,10 +368,29 @@ function onTouchMove(e) {
 function onTouchStart(e) {
     e.preventDefault();
     game.touches = e.touches;
+    UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
     game.draw();
 }
 function onTouchEnd(e) {
     game.touches = e.touches;
+}
+
+function UITouched()
+{
+    for (var i = 0; i < this.touches.length; i++) {
+        var touch = this.touches[i];
+        if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479) {
+            game.player.move('left');
+            console.log("Left arrow touched");
+        }
+        else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+            game.player.move('right');
+            console.log("Right arrow touched");
+        }
+        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+            //MAKE THE PLAYER JUMPY JUMP
+        }
+    }
 }
 
 function keyDownHandler(e) {
@@ -255,6 +402,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
+        game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
 }
 
