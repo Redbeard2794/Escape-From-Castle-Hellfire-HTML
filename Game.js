@@ -190,9 +190,9 @@ Game.prototype.update = function () {
 	  );
 
         game.world.ClearForces();
+		game.player.update();
     }
-    game.player.update();
-    game.draw();
+	game.draw();
     requestAnimFrame(game.update);
 }
 
