@@ -16,10 +16,15 @@ function main() {
     //listeners
     game.menu = new Menu();
     game.numPlatforms = 20;
-    
     game.player = new Player();
     game.platforms = [];
+    //load the platforms(for now)
     loadLevel();
+    //audio
+    //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
+    game.audio = document.createElement("audio");
+    game.audio.src = "sounds/wilhelmScream.ogg";
+
     //for (var i = 0; i < game.numPlatforms; i++) {
     //    game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
     //}
@@ -192,16 +197,9 @@ function loadLevel(plats)
         {
             parser = new DOMParser();
             xmlDoc = parser.parseFromString(txt, "text/xml");
-
-            //teeext = xmlDoc.getElementsByTagName("x")[0].childNodes[0].nodeValue;
-            //adsf = xmlDoc.getElementsByTagName("x")[1].childNodes[0].nodeValue;
-            //console.log(teeext);
-            //console.log(adsf);
             x = xmlDoc.getElementsByTagName("x")[i].childNodes[0].nodeValue;
             y = xmlDoc.getElementsByTagName("y")[i].childNodes[0].nodeValue;
-            console.log(x, y);
-            //pla = new Platform(x, y);
-            //game.platforms.push(pla);
+            //console.log(x, y);
             game.platforms[game.platforms.length] = new Platform(x,y);
         }
         else // Internet Explorer
@@ -211,9 +209,6 @@ function loadLevel(plats)
             xmlDoc.loadXML(txt);
             console.log(txt.length);
         }
-        //plats.push(pla);
-        //game.platforms.push(pla);
-        //game.platforms[game.platforms.length] = new Platform(x,y);
     }
 
 }
@@ -305,6 +300,25 @@ Game.prototype.update = function () {
 
         game.world.ClearForces();
     }
+
+    //for (var i = 0; i < this.touches.length; i++) {
+    //    var touch = this.touches[i];
+    //    if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        game.player.move('left');
+    //        console.log("Left arrow touched");
+    //    }
+    //    else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        game.player.move('right');
+    //        console.log("Right arrow touched");
+    //    }
+    //    else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
+    //    {
+    //        //MAKE THE PLAYER JUMPY JUMP
+    //    }
+    //}
+
     game.player.update();
     game.draw();
     requestAnimFrame(game.update);
@@ -336,9 +350,9 @@ Game.prototype.draw = function () {
             game.platforms[i].draw();
         }
         game.player.draw();
-        this.ctx.drawImage(game.jumpButton, 250, 400, 298, 57);
-        this.ctx.drawImage(game.leftArrow, 0, 400, 178, 84);
-        this.ctx.drawImage(game.rightArrow, 500, 400, 178, 84);
+        this.ctx.drawImage(game.jumpButton, 190, 410, 298, 57);
+        this.ctx.drawImage(game.leftArrow, 0, 395, 178, 84);
+        this.ctx.drawImage(game.rightArrow, 500, 395, 178, 84);
     }
     else if(gameState == MENU)
     {
@@ -355,10 +369,29 @@ function onTouchMove(e) {
 function onTouchStart(e) {
     e.preventDefault();
     game.touches = e.touches;
+    UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
     game.draw();
 }
 function onTouchEnd(e) {
     game.touches = e.touches;
+}
+
+function UITouched()
+{
+    for (var i = 0; i < this.touches.length; i++) {
+        var touch = this.touches[i];
+        if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479) {
+            game.player.move('left');
+            console.log("Left arrow touched");
+        }
+        else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+            game.player.move('right');
+            console.log("Right arrow touched");
+        }
+        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+            //MAKE THE PLAYER JUMPY JUMP
+        }
+    }
 }
 
 function keyDownHandler(e) {
@@ -370,6 +403,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
+        game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
 }
 
