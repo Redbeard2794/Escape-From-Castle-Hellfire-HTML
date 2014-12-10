@@ -51,6 +51,13 @@ function main() {
     game.rightArrow = new Image();
     game.rightArrow.src = 'textures/SourceArrowTQ.png';
 
+    game.leftArrowX = 0;
+    game.leftArrowY = 395;
+    game.rightArrowX = 500;
+    game.rightArrowY = 395;
+    game.jumpX = 190;
+    game.jumpY = 410;
+
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
 
@@ -349,9 +356,9 @@ Game.prototype.draw = function () {
             game.platforms[i].draw();
         }
         game.player.draw();
-        this.ctx.drawImage(game.jumpButton, 190, 410, 298, 57);
-        this.ctx.drawImage(game.leftArrow, 0, 395, 178, 84);
-        this.ctx.drawImage(game.rightArrow, 500, 395, 178, 84);
+        this.ctx.drawImage(game.jumpButton, game.jumpX, game.jumpY, 298, 57);
+        this.ctx.drawImage(game.leftArrow, game.leftArrowX, game.leftArrowY, 178, 84);
+        this.ctx.drawImage(game.rightArrow, game.rightArrowX, game.rightArrowY, 178, 84);
     }
     else if(gameState == MENU)
     {
