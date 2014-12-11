@@ -15,12 +15,13 @@ function Platform(posX,posY)
 	this.bodyDef.userData = 'platform'
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(this.SpriteWidth /2, this.SpriteHeight / 2);
+	this.fixDef.shape.SetAsBox((this.SpriteWidth / SCALE), (this.SpriteHeight / SCALE));
 
-	this.bodyDef.position.x = posX;
-	this.bodyDef.position.y = posY;
+	this.bodyDef.position.x = posX / SCALE;
+	this.bodyDef.position.y = posY / SCALE;
 
-    this.body = game.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
+	this.body = game.world.CreateBody(this.bodyDef);
+    this.body.CreateFixture(this.fixDef);
 }
 
 Platform.prototype.hit = function(impulse,entity)
@@ -34,14 +35,14 @@ Platform.prototype.update = function()
 
 Platform.prototype.draw = function()
 {
-    var pos = this.body.GetBody().GetPosition();
-    var angle = this.body.GetBody().GetAngle();
+    var pos = this.body.GetPosition();
+    var angle = this.body.GetAngle();
 
     game.ctx.save();
-    game.ctx.translate(pos.x, pos.y);
+    game.ctx.translate(pos.x *SCALE, pos.y *SCALE);
     game.ctx.rotate(angle);
-    var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
+    var scale = new b2Vec2(this.SpriteWidth,this.SpriteHeight );
     game.ctx.scale(scale, scale);
-    game.ctx.drawImage(this.Sprite , -scale.x,-scale.y, this.SpriteWidth ,this.SpriteHeight );
+    game.ctx.drawImage(this.Sprite , -scale.x,-scale.y,this.SpriteWidth *2,this.SpriteHeight *2);
     game.ctx.restore();
 }

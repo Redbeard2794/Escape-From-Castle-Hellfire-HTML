@@ -32,12 +32,15 @@ function Player()
 	this.bodyDef.userData = 'player';
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox(this.SpriteWidth / 2, this.SpriteHeight / 2);
+	this.fixDef.shape.SetAsBox((this.SpriteWidth/ 30) /2, (this.SpriteHeight / 30) / 2);
 
-	this.bodyDef.position.x = 100;
-	this.bodyDef.position.y = 100;
+	this.bodyDef.position.x = 100 /30;
+	this.bodyDef.position.y = 100 /30;
+	this.bodyDef.FixedRotation = true;
 
-	this.body = game.world.CreateBody(this.bodyDef).CreateFixture(this.fixDef);
+	this.body = game.world.CreateBody(this.bodyDef);
+	this.body.CreateFixture(this.fixDef);
+	
     //for animating the sprites
 	this.currTime = Date.now();
 	this.prevTime = 0;
@@ -46,7 +49,7 @@ function Player()
 	this.sx = 0;
 	this.sy = 0;
 	this.moving = false;
-	this.prevX = this.body.GetBody().GetPosition();
+	this.prevX = this.body.GetPosition();
 }
 Player.prototype.update = function()
 {
@@ -98,18 +101,16 @@ Player.prototype.update = function()
 
 Player.prototype.move = function(key)
 {
-    var pos = this.body.GetBody().GetPosition();
-    body = this.body.GetBody();
     if (key == 'right') {
         this.right = true;
         this.moving = true;
         this.idle = false;
         this.currentSprite = this.spriteSheet;
-        if (body.IsAwake() == false) {
-            body.SetAwake(true);
+        if (this.body.IsAwake() == false) {
+            this.body.SetAwake(true);
         }
-        pos.x += 5;
-        body.SetPosition(pos);
+       
+        this.body.SetLinearVelocity(new b2Vec2(2, this.body.GetLinearVelocity().y));
 
     }
     else if (key == 'left') {
@@ -117,16 +118,20 @@ Player.prototype.move = function(key)
         this.moving = true;
         this.idle = false;
         this.currentSprite = this.spriteSheetLeftWalk;
-        if (body.IsAwake() == false) {
-            body.SetAwake(true);
+        if (this.body.IsAwake() == false) {
+            this.body.SetAwake(true);
         }
-        pos.x -= 5;
-        body.SetPosition(pos);
+        this.body.SetLinearVelocity(new b2Vec2(-2, this.body.GetLinearVelocity().y));
     }
     //else this.idle = true;
     
 }
 
+Player.prototype.jump = function()
+{
+    var pos = this.body.GetPosition();
+    this.body.ApplyImpulse(new b2Vec2(0,100),pos);
+}
 Player.prototype.hit = function(impulse, entity)
 {
     
@@ -134,11 +139,11 @@ Player.prototype.hit = function(impulse, entity)
 
 Player.prototype.draw = function()
 {
-    var pos = this.body.GetBody().GetPosition();
-    var angle = this.body.GetBody().GetAngle();
+    var pos = this.body.GetPosition();
+    var angle = this.body.GetAngle();
 
     game.ctx.save();
-    game.ctx.translate(pos.x, pos.y);
+    game.ctx.translate(pos.x * SCALE, pos.y * SCALE);
     game.ctx.rotate(angle);
     var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
     game.ctx.scale(scale, scale);

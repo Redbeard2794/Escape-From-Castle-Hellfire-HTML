@@ -5,7 +5,7 @@ var game;
 var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2Body = Box2D.Dynamics.b2Body, b2FixtureDef = Box2D.Dynamics.b2FixtureDef, b2Fixture = Box2D.Dynamics.b2Fixture, b2World = Box2D.Dynamics.b2World
                 , b2MassData = Box2D.Collision.Shapes.b2MassData, b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape, b2CircleShape = Box2D.Collision.Shapes.b2CircleShape, b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
-var SCALE = 30;
+var SCALE = 30
 
 var SPLASH = 0, MENU = 1, GAME = 2;
 var gameState;
@@ -60,7 +60,7 @@ function main() {
 
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
-
+    game.debug();
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
@@ -231,16 +231,27 @@ function init() {
     //create ground
     bodyDef.type = b2Body.b2_staticBody;
     // positions the center of the object (not upper left!)
-    bodyDef.position.x = game.screenWidth / 2 / SCALE;
-    bodyDef.position.y = 15;
+    bodyDef.position.x = (game.screenWidth / 2) / SCALE;
+    bodyDef.position.y = game.screenHeight / SCALE;
     bodyDef.userData = 'ground';
     fixDef.shape = new b2PolygonShape;
 
-    fixDef.shape.SetAsBox((game.screenWidth / SCALE) / 2, (10 / SCALE) / 2);
+    fixDef.shape.SetAsBox((game.screenWidth / SCALE) / 2, (15 / SCALE)  / 2);
     game.world.CreateBody(bodyDef).CreateFixture(fixDef);
     
 
 }; // init()
+
+Game.prototype.debug = function () {
+    this.debugDraw = new b2DebugDraw();
+    this.debugDraw.SetSprite(this.ctx);
+    this.debugDraw.SetDrawScale(SCALE);
+    this.debugDraw.SetFillAlpha(0.1);
+    this.debugDraw.SetLineThickness(.5);
+    this.debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+    this.world.SetDebugDraw(this.debugDraw);
+};
+
 function Game() {
     this.screenWidth = window.innerWidth;
     this.screenHeight = window.innerHeight;
@@ -301,15 +312,16 @@ Game.prototype.update = function () {
     {
         game.world.Step(
          1 / 60   //frame-rate
-      , 10       //velocity iterations
-	  , 10       //position iterations
+      , 8       //velocity iterations
+	  , 3       //position iterations
 	  );
 
         game.world.ClearForces();
-		game.player.update();
+        game.player.update();
+        
     }
-	game.draw();
-
+	//game.draw();
+    game.world.DrawDebugData();
     //for (var i = 0; i < this.touches.length; i++) {
     //    var touch = this.touches[i];
     //    if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479)
@@ -395,7 +407,7 @@ function UITouched()
             console.log("Right arrow touched");
         }
         else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-            //MAKE THE PLAYER JUMPY JUMP
+            game.player.jump();
         }
     }
 }
@@ -410,6 +422,10 @@ function keyDownHandler(e) {
     {
         game.player.move('left');
         game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
+    }
+    if(e.keyCode == "32")
+    {
+        game.player.jump();
     }
 }
 
