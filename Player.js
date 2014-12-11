@@ -2,7 +2,7 @@ function Player()
 {
 	//this.width = 30;
 	//this.height = 140;
-
+    this.isJumping = false;
     this.spriteSheet = new Image();
     this.spriteSheetLeftWalk = new Image();
     this.spriteSheetRightIdle = new Image();
@@ -129,12 +129,18 @@ Player.prototype.move = function(key)
 
 Player.prototype.jump = function()
 {
-    var pos = this.body.GetPosition();
-    this.body.ApplyImpulse(new b2Vec2(0,100),pos);
+    if (!this.isJumping) {
+        var pos = this.body.GetPosition();
+        this.body.ApplyImpulse(new b2Vec2(0, 100), pos);
+        this.isJumping = true;
+    }
 }
 Player.prototype.hit = function(impulse, entity)
 {
-    
+    if(entity == "platform" && body.GetLinearVelocity().y < 0)
+    {
+        this.isJumping = false;
+    }
 }
 
 Player.prototype.draw = function()
