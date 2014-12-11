@@ -10,14 +10,14 @@ function Player()
 
     
     //sources of each sprite sheet
-    this.spriteSheet.src = 'textures/PlayerRightFinal.png';
-    this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
-    this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
-    this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
+    //this.spriteSheet.src = 'textures/PlayerRightFinal.png';
+    //this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
+    //this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
+    //this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
     //current sprite
     this.currentSprite = this.spriteSheet;
     this.idle = true;
-    this.right = false;
+    this.right = true;
 
 	this.SpriteWidth = 50;
 	this.SpriteHeight = 72;
@@ -51,6 +51,15 @@ function Player()
 	this.moving = false;
 	this.prevX = this.body.GetPosition();
 }
+
+Player.prototype.loadImages = function()
+{
+    this.spriteSheet.src = 'textures/PlayerRightFinal.png';
+    this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
+    this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
+    this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
+}
+
 Player.prototype.update = function()
 {
     //for animating the sprites
@@ -148,13 +157,13 @@ Player.prototype.draw = function()
     var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
     game.ctx.scale(scale, scale);
     if(this.currentSprite == this.spriteSheet && this.idle == false)
-        game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
+        game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, this.SpriteWidth-1, this.SpriteHeight-1, -scale.x, -scale.y, 45, 73);
     else if (this.currentSprite == this.spriteSheetLeftWalk && this.idle == false)
-        game.ctx.drawImage(this.spriteSheetLeftWalk, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
+        game.ctx.drawImage(this.spriteSheetLeftWalk, this.sx, this.sy, this.SpriteWidth-1, this.SpriteHeight-1, -scale.x, -scale.y, 45, 73);
     else if (this.currentSprite == this.spriteSheetRightIdle && this.idle == true)
-        game.ctx.drawImage(this.spriteSheetRightIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
+        game.ctx.drawImage(this.spriteSheetRightIdle, this.sx, this.sy, this.SpriteWidth-1, this.SpriteHeight-1, -scale.x, -scale.y, 45, 73);
     else if (this.currentSprite == this.spriteSheetLeftIdle && this.idle == true)
-        game.ctx.drawImage(this.spriteSheetLeftIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, 45, 73);
+        game.ctx.drawImage(this.spriteSheetLeftIdle, this.sx, this.sy, this.SpriteWidth-1, this.SpriteHeight-1, -scale.x, -scale.y, 45, 73);
     game.ctx.restore();
 	
 }
