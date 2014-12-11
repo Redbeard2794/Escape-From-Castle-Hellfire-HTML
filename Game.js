@@ -268,7 +268,7 @@ function Game() {
 
 Game.prototype.loadAssets = function()
 {
-    game.audio.src = "sounds/wilhelmScream.mp3";
+    game.audio.src = "sounds/wilhelmScream.ogg";
     game.jumpButton.src = 'textures/JumpButton.png';
     game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
     game.rightArrow.src = 'textures/SourceArrowTQ.png';
