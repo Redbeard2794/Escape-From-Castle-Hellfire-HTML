@@ -36,11 +36,10 @@ function Player()
 
 	this.bodyDef.position.x = 100 /30;
 	this.bodyDef.position.y = 100 /30;
-	this.bodyDef.FixedRotation = true;
 
 	this.body = game.world.CreateBody(this.bodyDef);
 	this.body.CreateFixture(this.fixDef);
-	
+	this.body.SetFixedRotation(true);
     //for animating the sprites
 	this.currTime = Date.now();
 	this.prevTime = 0;
@@ -137,7 +136,7 @@ Player.prototype.jump = function()
 }
 Player.prototype.hit = function(impulse, entity)
 {
-    if(entity == "platform" && body.GetLinearVelocity().y < 0)
+    if(entity == "platform")
     {
         this.isJumping = false;
     }

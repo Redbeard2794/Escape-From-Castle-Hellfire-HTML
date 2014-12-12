@@ -320,8 +320,8 @@ Game.prototype.update = function () {
         game.player.update();
         
     }
-	//game.draw();
-    game.world.DrawDebugData();
+	game.draw();
+    //game.world.DrawDebugData();
     //for (var i = 0; i < this.touches.length; i++) {
     //    var touch = this.touches[i];
     //    if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479)
