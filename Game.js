@@ -18,12 +18,22 @@ function main() {
     game.numPlatforms = 20;
     game.player = new Player();
     game.platforms = [];
+    game.trapList = [];
+
+    var trap1 = new proxTrap(new b2Vec2(450, 0));
+    var trap2 = new proxTrap(new b2Vec2(1080, 0));
+    var trap3 = new proxTrap(new b2Vec2(1220, 0));
+
+    game.trapList[game.trapList.length] = trap1;
+    game.trapList[game.trapList.length] = trap2;
+    game.trapList[game.trapList.length] = trap3;
+
     //load the platforms(for now)
     loadLevel();
     //audio
     //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
-    game.audio = document.createElement("audio");
-    game.audio.src = "sounds/wilhelmScream.ogg";
+    //game.audio = document.createElement("audio");
+    //game.audio.src = "sounds/wilhelmScream.wav";
 
     //for (var i = 0; i < game.numPlatforms; i++) {
     //    game.platforms[game.platforms.length] = new Platform((80 * i) + 1, 300);
@@ -61,6 +71,7 @@ function main() {
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
     game.debug();
+    
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
@@ -81,11 +92,6 @@ function loadLevel(plats)
     txt = txt + "<x>400</x>";
     txt = txt + "<y>315</y>";
     txt = txt + "</Platform>"
-
-    //txt = txt + "<Platform>"
-    //txt = txt + "<x>450</x>";
-    //txt = txt + "<y>200</y>";
-    //txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
     txt = txt + "<x>480</x>";
@@ -220,7 +226,8 @@ function loadLevel(plats)
 
 }
 function init() {
-
+    //setTimeout(function () { game.player.loadImages() }, 2000);
+    //setTimeout(function () { game.loadAssets() }, 2000);
     game.world = new b2World(new b2Vec2(0, 10), true);
 
     var fixDef = new b2FixtureDef;
@@ -263,6 +270,16 @@ function Game() {
     this.initTouch();
 
 }
+
+Game.prototype.loadAssets = function()
+{
+    //game.audio.src = "sounds/wilhelmScream.ogg";
+    game.jumpButton.src = 'textures/JumpButton.png';
+    game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
+    game.rightArrow.src = 'textures/SourceArrowTQ.png';
+    game.background.src = 'textures/level1Background.png';
+}
+
 Game.prototype.addContactListener = function (callbacks) {
     var listener = new Box2D.Dynamics.b2ContactListener;
     if (callbacks.BeginContact) listener.BeginContact = function (contact) {
@@ -317,29 +334,30 @@ Game.prototype.update = function () {
 	  );
 
         game.world.ClearForces();
+        game.checkTraps();
         game.player.update();
         
     }
 	game.draw();
     //game.world.DrawDebugData();
-    //for (var i = 0; i < this.touches.length; i++) {
-    //    var touch = this.touches[i];
-    //    if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479)
-    //    {
-    //        game.player.move('left');
-    //        console.log("Left arrow touched");
-    //    }
-    //    else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
-    //    {
-    //        game.player.move('right');
-    //        console.log("Right arrow touched");
-    //    }
-    //    else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479)
-    //    {
-    //        //MAKE THE PLAYER JUMPY JUMP
-    //    }
-    //}
+
     requestAnimFrame(game.update);
+}
+
+Game.prototype.checkTraps = function()
+{
+    var theList = game.trapList;
+    var size = theList.length;
+    var playerPos = game.player.body.GetPosition().x * 30;
+    for(var i = 0; i < size;i++)
+    {
+        var trapPos = theList[i].body.GetPosition().x * 30;
+        var distance = trapPos - playerPos; 
+        if(distance < 60)
+        {
+            theList[i].Trigger();
+        }
+    }
 }
 
 Game.prototype.draw = function () {
@@ -351,26 +369,53 @@ Game.prototype.draw = function () {
     //use it e.g. draw a circle around each finger
     for (var i = 0; i < this.touches.length; i++) {
         var touch = this.touches[i];
-        this.ctx.beginPath();
-        this.ctx.fillStyle = "white";
-        this.ctx.fillText(" x:" + touch.clientX + " y:" + touch.clientY, touch.clientX + 30, touch.clientY - 30);
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = "red";
-        this.ctx.lineWidth = "6";
-        this.ctx.arc(touch.clientX, touch.clientY, 40, 0, Math.PI * 2, true);
-        this.ctx.stroke();
+
+        if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY+479) {
+                    game.player.move('left');
+                    console.log("Left arrow touched");
+                }
+        else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
+                    game.player.move('right');
+                    console.log("Right arrow touched");
+                }
+                else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+                    game.player.jump();
+                    //game.audio.play();
+                }
+           // }
     }
     
     if (gameState == GAME)
     {
-        this.ctx.drawImage(game.background, -200, 0, 3500, 480);
+        this.ctx.save();
+        this.ctx.translate(-200, 0);
+        this.ctx.drawImage(game.background, 0, 0, 3499, 479);
+        this.ctx.restore();
+
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
         }
+        for (var i = 0; i < game.trapList.length; i++)
+        {
+            game.trapList[i].draw();
+        }
         game.player.draw();
-        this.ctx.drawImage(game.jumpButton, game.jumpX, game.jumpY, 298, 57);
-        this.ctx.drawImage(game.leftArrow, game.leftArrowX, game.leftArrowY, 178, 84);
-        this.ctx.drawImage(game.rightArrow, game.rightArrowX, game.rightArrowY, 178, 84);
+
+        this.ctx.save();
+        this.ctx.translate(game.jumpX, game.jumpY);
+        this.ctx.drawImage(game.jumpButton, 0, 0, 298, 57);
+        this.ctx.restore();
+
+
+        this.ctx.save();
+        this.ctx.translate(game.leftArrowX, game.leftArrowY);
+        this.ctx.drawImage(game.leftArrow, 0, 0, 178, 84);
+        this.ctx.restore();
+
+        this.ctx.save();
+        this.ctx.translate(game.rightArrowX, game.rightArrowY);
+        this.ctx.drawImage(game.rightArrow, 0, 0, 178, 84);
+        this.ctx.restore();
     }
     else if(gameState == MENU)
     {
@@ -387,30 +432,30 @@ function onTouchMove(e) {
 function onTouchStart(e) {
     e.preventDefault();
     game.touches = e.touches;
-    UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
+    //UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
     game.draw();
 }
 function onTouchEnd(e) {
     game.touches = e.touches;
 }
 
-function UITouched()
-{
-    for (var i = 0; i < this.touches.length; i++) {
-        var touch = this.touches[i];
-        if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479) {
-            game.player.move('left');
-            console.log("Left arrow touched");
-        }
-        else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-            game.player.move('right');
-            console.log("Right arrow touched");
-        }
-        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-            game.player.jump();
-        }
-    }
-}
+//function UITouched()
+//{
+//    for (var i = 0; i < this.touches.length; i++) {
+//        var touch = this.touches[i];
+//        if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479) {
+//            game.player.move('left');
+//            console.log("Left arrow touched");
+//        }
+//        else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+//            game.player.move('right');
+//            console.log("Right arrow touched");
+//        }
+//        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+//            game.player.jump();
+//        }
+//    }
+//}
 
 function keyDownHandler(e) {
 
@@ -421,7 +466,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
-        game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
+        //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
     if(e.keyCode == "32")
     {
