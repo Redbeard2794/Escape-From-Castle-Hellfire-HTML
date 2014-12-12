@@ -46,9 +46,23 @@ function main() {
             },
 
             PostSolve: function (bodyA, bodyB, impulse) {
-                if (impulse < 0.1) return; // playing with thresholds
-                bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
-                bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
+                if (impulse < 0.1) { return; } // playing with thresholds
+                if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform' ||
+                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'player')
+                {
+                    bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
+                    bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
+                }
+                else if(bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform' ||
+                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'proxtrap')
+                {
+
+                }
+                else if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'proxtrap' ||
+                    bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform')
+                {
+
+                }
             }
         });
 
