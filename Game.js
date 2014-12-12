@@ -381,7 +381,7 @@ Game.prototype.draw = function () {
     }
 
     if (gameState == GAME) {
-        this.ctx.save();
+        //this.ctx.save();
 
         this.ctx.save();
         this.ctx.translate(-200, 0);
@@ -389,7 +389,7 @@ Game.prototype.draw = function () {
         this.ctx.restore();
 
         var playerPos = game.player.body.GetPosition();
-        this.ctx.translate(-playerPos.x * 30, 1)
+        //this.ctx.translate(-playerPos.x * 30, 1)
 
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
@@ -397,7 +397,7 @@ Game.prototype.draw = function () {
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].draw();
         }
-        this.ctx.restore();
+       // this.ctx.restore();
 
         this.ctx.save();
         this.ctx.translate(game.jumpX, game.jumpY);
