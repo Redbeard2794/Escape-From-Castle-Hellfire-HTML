@@ -15,7 +15,7 @@ function main() {
     init(); //initalize Box2D world (all object creation must be done after this)
     //listeners
     game.menu = new Menu();
-    game.numPlatforms = 20;
+    game.numPlatforms = 18;
     game.player = new Player();
     game.platforms = [];
     game.trapList = [];
@@ -90,7 +90,7 @@ function main() {
 function loadLevel(plats) {
     txt = "<level1>";
     txt = txt + "<Platform>"
-    txt = txt + "<x>120</x>";
+    txt = txt + "<x>80</x>";
     txt = txt + "<y>315</y>";
     txt = txt + "</Platform>"
 
@@ -115,23 +115,18 @@ function loadLevel(plats) {
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
-    txt = txt + "<x>420</x>";
+    txt = txt + "<x>640</x>";
     txt = txt + "<y>80</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
-    txt = txt + "<x>640</x>";
-    txt = txt + "<y>60</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
     txt = txt + "<x>780</x>";
-    txt = txt + "<y>60</y>";
+    txt = txt + "<y>160</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
     txt = txt + "<x>920</x>";
-    txt = txt + "<y>60</y>";
+    txt = txt + "<y>80</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
@@ -160,17 +155,12 @@ function loadLevel(plats) {
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
-    txt = txt + "<x>1480</x>";
+    txt = txt + "<x>1760</x>";
     txt = txt + "<y>300</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
-    txt = txt + "<x>1760</x>";
-    txt = txt + "<y>340</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1900</x>";
+    txt = txt + "<x>1950</x>";
     txt = txt + "<y>340</y>";
     txt = txt + "</Platform>"
 
@@ -181,12 +171,12 @@ function loadLevel(plats) {
 
     txt = txt + "<Platform>"
     txt = txt + "<x>2180</x>";
-    txt = txt + "<y>140</y>";
+    txt = txt + "<y>170</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
     txt = txt + "<x>2320</x>";
-    txt = txt + "<y>60</y>";
+    txt = txt + "<y>80</y>";
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
@@ -195,7 +185,7 @@ function loadLevel(plats) {
     txt = txt + "</Platform>"
 
     txt = txt + "<Platform>"
-    txt = txt + "<x>2700</x>";
+    txt = txt + "<x>2650</x>";
     txt = txt + "<y>315</y>";
     txt = txt + "</Platform>"
 
