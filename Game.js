@@ -22,7 +22,7 @@ function main() {
     loadLevel();
     //audio
     //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
-    game.audio = document.createElement("audio");
+    //game.audio = document.createElement("audio");
     //game.audio.src = "sounds/wilhelmScream.wav";
 
     //for (var i = 0; i < game.numPlatforms; i++) {
@@ -45,11 +45,11 @@ function main() {
     gameState = GAME;
     //stuff for UI(May move it somewhere else after)
     game.jumpButton = new Image();
-    //game.jumpButton.src = 'textures/JumpButton.png';
+    game.jumpButton.src = 'textures/JumpButton.png';
     game.leftArrow = new Image();
-    //game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
+    game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
     game.rightArrow = new Image();
-    //game.rightArrow.src = 'textures/SourceArrowTQ.png';
+    game.rightArrow.src = 'textures/SourceArrowTQ.png';
 
     game.leftArrowX = 0;
     game.leftArrowY = 395;
@@ -59,7 +59,7 @@ function main() {
     game.jumpY = 410;
 
     game.background = new Image();
-    //game.background.src = 'textures/level1Background.png';
+    game.background.src = 'textures/level1Background.png';
     game.debug();
     
     requestAnimFrame(game.update); //kickoff the update cycle
@@ -221,8 +221,8 @@ function loadLevel(plats)
 
 }
 function init() {
-    setTimeout(function () { game.player.loadImages() }, 2000);
-    setTimeout(function () { game.loadAssets() }, 2000);
+    //setTimeout(function () { game.player.loadImages() }, 2000);
+    //setTimeout(function () { game.loadAssets() }, 2000);
     game.world = new b2World(new b2Vec2(0, 10), true);
 
     var fixDef = new b2FixtureDef;
@@ -268,7 +268,7 @@ function Game() {
 
 Game.prototype.loadAssets = function()
 {
-    game.audio.src = "sounds/wilhelmScream.ogg";
+    //game.audio.src = "sounds/wilhelmScream.ogg";
     game.jumpButton.src = 'textures/JumpButton.png';
     game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
     game.rightArrow.src = 'textures/SourceArrowTQ.png';
@@ -464,7 +464,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
-        game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
+        //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
     if(e.keyCode == "32")
     {

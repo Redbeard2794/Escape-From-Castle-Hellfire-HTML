@@ -10,10 +10,10 @@ function Player()
 
     
     //sources of each sprite sheet
-    //this.spriteSheet.src = 'textures/PlayerRightFinal.png';
-    //this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
-    //this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
-    //this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
+    this.spriteSheet.src = 'textures/PlayerRightFinal.png';
+    this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
+    this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
+    this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
     //current sprite
     this.currentSprite = this.spriteSheet;
     this.idle = true;
@@ -146,7 +146,7 @@ Player.prototype.jump = function()
 }
 Player.prototype.hit = function(impulse, entity)
 {
-    if(entity == "platform" && body.GetLinearVelocity().y < 0)
+    if(entity == "platform" && this.body.GetLinearVelocity().y < 0)
     {
         this.isJumping = false;
     }
