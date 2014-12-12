@@ -4,7 +4,8 @@ function Platform(posX,posY)
     this.Sprite.src = "textures/plat1.png"
     this.SpriteWidth = 40;
     this.SpriteHeight = 8;
-
+    this.worldupdate = false;
+    this.wasMoved = false;
 	this.fixDef = new b2FixtureDef;
 	this.fixDef.density = 1.0;
 	this.fixDef.friction = 0.5;
