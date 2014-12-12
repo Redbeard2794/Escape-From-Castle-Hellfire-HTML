@@ -11,7 +11,7 @@ function Platform(posX,posY)
 	this.fixDef.restitution = 0.2;
 	
 	this.bodyDef = new b2BodyDef;
-	this.bodyDef.type = b2Body.b2_staticBody;
+	this.bodyDef.type = b2Body.b2_kinematicBody;
 	this.bodyDef.userData = 'platform'
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
@@ -45,4 +45,5 @@ Platform.prototype.draw = function()
     game.ctx.scale(scale, scale);
     game.ctx.drawImage(this.Sprite , -scale.x,-scale.y,this.SpriteWidth *2,this.SpriteHeight *2);
     game.ctx.restore();
+
 }

@@ -48,20 +48,18 @@ function main() {
             PostSolve: function (bodyA, bodyB, impulse) {
                 if (impulse < 0.1) { return; } // playing with thresholds
                 if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform' ||
-                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'player')
-                {
+                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'player') {
                     bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
                     bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
                 }
-                else if(bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform' ||
-                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'proxtrap')
-                {
+                else if (bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform' ||
+                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'proxtrap') {
 
                 }
-                else if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'proxtrap' ||
-                    bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform')
-                {
-
+                else if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'proxtrap' ||
+                    bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform') {
+                    bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
+                    bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
                 }
             }
         });
@@ -85,12 +83,11 @@ function main() {
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
     game.debug();
-    
+
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
-function loadLevel(plats)
-{
+function loadLevel(plats) {
     txt = "<level1>";
     txt = txt + "<Platform>"
     txt = txt + "<x>120</x>";
@@ -215,19 +212,17 @@ function loadLevel(plats)
     //xhttp.send();
     //xmlDoc = xhttp.responseXML;
 
-    for (var i = 0; i < game.numPlatforms; i++)
-    {
+    for (var i = 0; i < game.numPlatforms; i++) {
         var x;
         var y;
         //var pla;
-        if (window.DOMParser)
-        {
+        if (window.DOMParser) {
             parser = new DOMParser();
             xmlDoc = parser.parseFromString(txt, "text/xml");
             x = xmlDoc.getElementsByTagName("x")[i].childNodes[0].nodeValue;
             y = xmlDoc.getElementsByTagName("y")[i].childNodes[0].nodeValue;
             //console.log(x, y);
-            game.platforms[game.platforms.length] = new Platform(x,y);
+            game.platforms[game.platforms.length] = new Platform(x, y);
         }
         else // Internet Explorer
         {
@@ -257,9 +252,9 @@ function init() {
     bodyDef.userData = 'ground';
     fixDef.shape = new b2PolygonShape;
 
-    fixDef.shape.SetAsBox((game.screenWidth / SCALE) / 2, (15 / SCALE)  / 2);
+    fixDef.shape.SetAsBox((game.screenWidth / SCALE) / 2, (15 / SCALE) / 2);
     game.world.CreateBody(bodyDef).CreateFixture(fixDef);
-    
+
 
 }; // init()
 
@@ -285,8 +280,7 @@ function Game() {
 
 }
 
-Game.prototype.loadAssets = function()
-{
+Game.prototype.loadAssets = function () {
     //game.audio.src = "sounds/wilhelmScream.ogg";
     game.jumpButton.src = 'textures/JumpButton.png';
     game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
@@ -339,36 +333,33 @@ Game.prototype.initTouch = function () {
 }
 
 Game.prototype.update = function () {
-    if (gameState == GAME)
-    {
+    if (gameState == GAME) {
         game.world.Step(
          1 / 60   //frame-rate
-      , 8       //velocity iterations
-	  , 3       //position iterations
+      , 10       //velocity iterations
+	  , 10       //position iterations
 	  );
 
         game.world.ClearForces();
         game.checkTraps();
         game.player.update();
-        
+
     }
-	game.draw();
+    game.draw();
     //game.world.DrawDebugData();
 
     requestAnimFrame(game.update);
 }
 
-Game.prototype.checkTraps = function()
-{
+
+Game.prototype.checkTraps = function () {
     var theList = game.trapList;
     var size = theList.length;
     var playerPos = game.player.body.GetPosition().x * 30;
-    for(var i = 0; i < size;i++)
-    {
+    for (var i = 0; i < size; i++) {
         var trapPos = theList[i].body.GetPosition().x * 30;
-        var distance = trapPos - playerPos; 
-        if(distance < 60)
-        {
+        var distance = trapPos - playerPos;
+        if (distance < 60) {
             theList[i].Trigger();
         }
     }
@@ -384,36 +375,39 @@ Game.prototype.draw = function () {
     for (var i = 0; i < this.touches.length; i++) {
         var touch = this.touches[i];
 
-        if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY+479) {
-                    game.player.move('left');
-                    console.log("Left arrow touched");
-                }
+        if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
+            game.player.move('left');
+            console.log("Left arrow touched");
+        }
         else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
-                    game.player.move('right');
-                    console.log("Right arrow touched");
-                }
-                else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-                    game.player.jump();
-                    //game.audio.play();
-                }
-           // }
+            game.player.move('right');
+            console.log("Right arrow touched");
+        }
+        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+            game.player.jump();
+            //game.audio.play();
+        }
+        // }
     }
-    
-    if (gameState == GAME)
-    {
+
+    if (gameState == GAME) {
+        this.ctx.save();
+
         this.ctx.save();
         this.ctx.translate(-200, 0);
         this.ctx.drawImage(game.background, 0, 0, 3499, 479);
         this.ctx.restore();
 
+        var playerPos = game.player.body.GetPosition();
+        this.ctx.translate(-playerPos.x * 30, 1)
+
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
         }
-        for (var i = 0; i < game.trapList.length; i++)
-        {
+        for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].draw();
         }
-        game.player.draw();
+        this.ctx.restore();
 
         this.ctx.save();
         this.ctx.translate(game.jumpX, game.jumpY);
@@ -430,9 +424,11 @@ Game.prototype.draw = function () {
         this.ctx.translate(game.rightArrowX, game.rightArrowY);
         this.ctx.drawImage(game.rightArrow, 0, 0, 178, 84);
         this.ctx.restore();
+
+
+        game.player.draw();
     }
-    else if(gameState == MENU)
-    {
+    else if (gameState == MENU) {
         game.menu.draw();
     }
 
@@ -482,8 +478,7 @@ function keyDownHandler(e) {
         game.player.move('left');
         //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
-    if(e.keyCode == "32")
-    {
+    if (e.keyCode == "32") {
         game.player.jump();
     }
 }

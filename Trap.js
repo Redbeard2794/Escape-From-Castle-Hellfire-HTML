@@ -12,7 +12,7 @@ function proxTrap(Position)
     this.fixDef.restitution = 0.2;
 
     this.bodyDef = new b2BodyDef;
-    this.bodyDef.type = b2Body.b2_staticBody;
+    this.bodyDef.type = b2Body.b2_kinematicBody;
     this.bodyDef.userData = 'proxtrap';
     this.bodyDef.owner = this;
     this.fixDef.shape = new b2PolygonShape;
@@ -30,6 +30,10 @@ proxTrap.prototype.Trigger = function()
     this.body.SetType(b2Body.b2_dynamicBody);
 }
 
+proxTrap.prototype.hit = function()
+{
+
+}
 proxTrap.prototype.draw = function()
 {
     var pos = this.body.GetPosition();
@@ -41,4 +45,5 @@ proxTrap.prototype.draw = function()
     game.ctx.scale(size, size);
     game.ctx.drawImage(this.sprite, -size.x, -size.y);
     game.ctx.restore();
+
 }

@@ -7,7 +7,7 @@ function Player()
     this.spriteSheetLeftWalk = new Image();
     this.spriteSheetRightIdle = new Image();
     this.spriteSheetLeftIdle = new Image();
-
+    this.moved = false;
     
     //sources of each sprite sheet
     this.spriteSheet.src = 'textures/PlayerRightFinal.png';
@@ -122,7 +122,6 @@ Player.prototype.move = function(key)
         if (this.body.IsAwake() == false) {
             this.body.SetAwake(true);
         }
-       
         this.body.SetLinearVelocity(new b2Vec2(2, this.body.GetLinearVelocity().y));
 
     }
