@@ -67,11 +67,11 @@ function main() {
     gameState = GAME;
     //stuff for UI(May move it somewhere else after)
     game.jumpButton = new Image();
-    game.jumpButton.src = 'textures/JumpButton.png';
+    game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
     game.leftArrow = new Image();
-    game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
+    game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
     game.rightArrow = new Image();
-    game.rightArrow.src = 'textures/SourceArrowTQ.png';
+    game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
 
     game.leftArrowX = 0;
     game.leftArrowY = 395;
@@ -88,142 +88,39 @@ function main() {
 }
 
 function loadLevel(plats) {
-    txt = "<level1>";
-    txt = txt + "<Platform>"
-    txt = txt + "<x>80</x>";
-    txt = txt + "<y>315</y>";
-    txt = txt + "</Platform>"
+	//loads from external xml file
 
-    txt = txt + "<Platform>"
-    txt = txt + "<x>250</x>";
-    txt = txt + "<y>315</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>400</x>";
-    txt = txt + "<y>315</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>480</x>";
-    txt = txt + "<y>240</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>560</x>";
-    txt = txt + "<y>160</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>640</x>";
-    txt = txt + "<y>80</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>780</x>";
-    txt = txt + "<y>160</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>920</x>";
-    txt = txt + "<y>80</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1060</x>";
-    txt = txt + "<y>140</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1200</x>";
-    txt = txt + "<y>220</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1340</x>";
-    txt = txt + "<y>140</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1480</x>";
-    txt = txt + "<y>300</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1620</x>";
-    txt = txt + "<y>340</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1760</x>";
-    txt = txt + "<y>300</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>1950</x>";
-    txt = txt + "<y>340</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>2040</x>";
-    txt = txt + "<y>260</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>2180</x>";
-    txt = txt + "<y>170</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>2320</x>";
-    txt = txt + "<y>80</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>2460</x>";
-    txt = txt + "<y>140</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "<Platform>"
-    txt = txt + "<x>2650</x>";
-    txt = txt + "<y>315</y>";
-    txt = txt + "</Platform>"
-
-    txt = txt + "</level1>";
-
-    //if (window.XMLHttpRequest) {
-    //    xhttp = new XMLHttpRequest();
-    //}
-    //else // code for IE5 and IE6
-    //{
-    //    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    //}
-    //xhttp.open("GET", "levels/Level1.xml");
-    //xhttp.send();
-    //xmlDoc = xhttp.responseXML;
-
+    xmlDoc=loadXMLDoc("levels/Level1.xml");
     for (var i = 0; i < game.numPlatforms; i++) {
         var x;
         var y;
-        //var pla;
-        if (window.DOMParser) {
-            parser = new DOMParser();
-            xmlDoc = parser.parseFromString(txt, "text/xml");
-            x = xmlDoc.getElementsByTagName("x")[i].childNodes[0].nodeValue;
-            y = xmlDoc.getElementsByTagName("y")[i].childNodes[0].nodeValue;
-            //console.log(x, y);
-            game.platforms[game.platforms.length] = new Platform(x, y);
-        }
-        else // Internet Explorer
-        {
-            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-            xmlDoc.async = false;
-            xmlDoc.loadXML(txt);
-            console.log(txt.length);
-        }
+
+        x = xmlDoc.getElementsByTagName("x")[i].childNodes[0].nodeValue;
+        y = xmlDoc.getElementsByTagName("y")[i].childNodes[0].nodeValue;
+
+        game.platforms[game.platforms.length] = new Platform(x, y);
     }
 
+
 }
+
+//for loading from an external xml file
+//source: http://www.w3schools.com/dom/dom_loadxmldoc.asp
+function loadXMLDoc(filename)
+{
+    if (window.XMLHttpRequest)
+      {
+		xhttp=new XMLHttpRequest();
+      }
+    else // code for IE5 and IE6(of course IE has to be different!)
+      {
+		xhttp=new ActiveXObject("Microsoft.XMLHTTP");
+      }
+    xhttp.open("GET",filename,false);
+    xhttp.send();
+    return xhttp.responseXML;
+} 
+
 function init() {
     //setTimeout(function () { game.player.loadImages() }, 2000);
     //setTimeout(function () { game.loadAssets() }, 2000);
@@ -272,9 +169,9 @@ function Game() {
 
 Game.prototype.loadAssets = function () {
     //game.audio.src = "sounds/wilhelmScream.ogg";
-    game.jumpButton.src = 'textures/JumpButton.png';
-    game.leftArrow.src = 'textures/SourceArrowTQLeft.png';
-    game.rightArrow.src = 'textures/SourceArrowTQ.png';
+    game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
+    game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
+    game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
     game.background.src = 'textures/level1Background.png';
 }
 

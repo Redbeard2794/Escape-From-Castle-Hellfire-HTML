@@ -1,9 +1,9 @@
 function Menu()
 {
     this.playButton = new Image();
-    this.playButton.src = 'textures/playButton.png';
+    this.playButton.src = 'textures/menuButtons/playButton.png';
     this.optionsButton = new Image();
-    this.optionsButton.src = 'textures/optionsButton.png';
+    this.optionsButton.src = 'textures/menuButtons/optionsButton.png';
 
 }
 Menu.prototype.update = function()

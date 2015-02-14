@@ -10,10 +10,10 @@ function Player()
     this.moved = false;
     
     //sources of each sprite sheet
-    this.spriteSheet.src = 'textures/PlayerRightFinal.png';
-    this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
-    this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
-    this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
+    this.spriteSheet.src = 'textures/player/PlayerRightFinal.png';
+    this.spriteSheetLeftWalk.src = 'textures/player/PlayerLeftFinal.png';
+    this.spriteSheetRightIdle.src = 'textures/player/playerIdleRightSheet.png';
+    this.spriteSheetLeftIdle.src = 'textures/player/playerIdleLeftSheet.png';
     //current sprite
     this.currentSprite = this.spriteSheet;
     this.idle = true;
@@ -53,10 +53,10 @@ function Player()
 
 Player.prototype.loadImages = function()
 {
-    this.spriteSheet.src = 'textures/PlayerRightFinal.png';
-    this.spriteSheetLeftWalk.src = 'textures/PlayerLeftFinal.png';
-    this.spriteSheetRightIdle.src = 'textures/playerIdleRightSheet.png';
-    this.spriteSheetLeftIdle.src = 'textures/playerIdleLeftSheet.png';
+    this.spriteSheet.src = 'textures/player/PlayerRightFinal.png';
+    this.spriteSheetLeftWalk.src = 'textures/player/player/PlayerLeftFinal.png';
+    this.spriteSheetRightIdle.src = 'textures/player/playerIdleRightSheet.png';
+    this.spriteSheetLeftIdle.src = 'textures/player/playerIdleLeftSheet.png';
 }
 
 Player.prototype.update = function()
