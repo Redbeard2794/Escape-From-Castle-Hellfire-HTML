@@ -82,6 +82,10 @@ function main() {
 
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
+	
+	game.splash = new Image();
+	game.splash.src = 'textures/SplashScreen.png';
+	
     game.debug();
 
     requestAnimFrame(game.update); //kickoff the update cycle
@@ -255,35 +259,63 @@ Game.prototype.checkTraps = function () {
 Game.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
 
+        this.ctx.save();
+        this.ctx.translate(-200, 0);
+        this.ctx.drawImage(game.background, 0, 0, 3499, 479);
+        this.ctx.restore();
 
 
     //touches is an array that holds all the touch info
     //use it e.g. draw a circle around each finger
-    for (var i = 0; i < this.touches.length; i++) {
+    for (var i = 0; i < this.touches.length; i++) 
+	{
         var touch = this.touches[i];
-
-        if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
-            game.player.move('left');
-            console.log("Left arrow touched");
-        }
-        else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
-            game.player.move('right');
-            console.log("Right arrow touched");
-        }
-        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-            game.player.jump();
-            //game.audio.play();
-        }
+		if(gameState ==GAME)
+		{
+			if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
+				game.player.move('left');
+				console.log("Left arrow touched");
+			}
+			else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
+				game.player.move('right');
+				console.log("Right arrow touched");
+			}
+			else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+				game.player.jump();
+				//game.audio.play();
+			}
+		}
+		else if(gameState == MENU)
+		{
+			if (touch.clientX > game.menu.playButtonX && touch.clientX < game.menu.playButtonX + game.menu.buttonWidth 
+			&& touch.clientY > game.menu.playButtonY && touch.clientY < game.menu.playButtonY  + game.menu.buttonHeight) 
+			{
+				gameState = GAME;
+				console.log("Play button touched");
+			}
+			
+			if (touch.clientX > game.menu.multiplayerButtonX && touch.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth 
+			&& touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY  + game.menu.buttonHeight) 
+			{
+				console.log("multiplayer button touched");
+			}
+			
+			if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth 
+			&& touch.clientY > game.menu.optionsButtonY && touch.clientY < game.menu.optionsButtonY  + game.menu.buttonHeight) 
+			{
+				console.log("options button touched");
+			}
+		}
         // }
     }
 
     if (gameState == GAME) {
         //this.ctx.save();
 
-        this.ctx.save();
+        /*this.ctx.save();
         this.ctx.translate(-200, 0);
         this.ctx.drawImage(game.background, 0, 0, 3499, 479);
-        this.ctx.restore();
+        this.ctx.restore();*/
 
         var playerPos = game.player.body.GetPosition();
         //this.ctx.translate(-playerPos.x * 30, 1)
@@ -318,6 +350,14 @@ Game.prototype.draw = function () {
     else if (gameState == MENU) {
         game.menu.draw();
     }
+	
+	else if (gameState == SPLASH)
+	{
+		this.ctx.save();
+        this.ctx.translate(200, 200);
+        this.ctx.drawImage(game.splash, 0, 0, 517, 198);
+        this.ctx.restore();
+	}
 
 }
 
@@ -368,6 +408,13 @@ function keyDownHandler(e) {
     if (e.keyCode == "32") {
         game.player.jump();
     }
+	
+	//for testing purposes only
+	if(gameState == MENU && e.keyCode == "68")
+	{
+		//gameState = GAME;
+	}
+	
 }
 
 //Utilities
