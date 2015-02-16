@@ -45,6 +45,20 @@ function main() {
             BeginContact: function (idA, idB) {
             },
 
+            //PreSolve: function (contact, oldManifold) {
+            //    contact.SetEnabled(false);
+            //    var bodyA = contact.GetFixtureA().GetBody();
+            //    var bodyB = contact.GetFixtureB().GetBody();
+            //    if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform')
+            //    {
+            //        bodyA.SetLinearVelocity(new b2Vec2(bodyA.GetLinearVelocity().x, -1));
+            //        bodyA.GetOwner().hit(null, bodyB.GetUserData());
+            //    }
+            //    else if (bodyB.GetUserData() == 'player' && bodyA.GetUserData() == 'platform') {
+            //        bodyB.SetLinearVelocity(new b2Vec2(bodyB.GetLinearVelocity().x, -1));
+            //        bodyB.GetOwner().hit(null, bodyA.GetUserData());
+            //    }
+            //},
             PostSolve: function (bodyA, bodyB, impulse) {
                 if (impulse < 0.1) { return; } // playing with thresholds
                 if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform' ||
@@ -62,6 +76,7 @@ function main() {
                     bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
                 }
             }
+
         });
 
     gameState = GAME;
@@ -194,6 +209,9 @@ Game.prototype.addContactListener = function (callbacks) {
                              contact.GetFixtureB().GetBody(),
                              impulse.normalImpulses[0]);
     }
+    if (callbacks.PreSolve) listener.PreSolve = function (contact, oldManifold) {
+        callbacks.PreSolve(contact, oldManifold);
+    }
     this.world.SetContactListener(listener);
 }
 Game.prototype.initCanvas = function () {
@@ -226,19 +244,24 @@ Game.prototype.initTouch = function () {
 Game.prototype.update = function () {
     if (gameState == GAME) {
         game.world.Step(
-         1 / 60   //frame-rate
-      , 10       //velocity iterations
-	  , 10       //position iterations
+         1 / 30   //frame-rate
+      , 7       //velocity iterations
+	  , 7       //position iterations
 	  );
 
         game.world.ClearForces();
         game.checkTraps();
         game.player.update();
-
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].update(game.player.body.GetLinearVelocity());
+        }
+        for (var i = 0; i < game.trapList.length; i++) {
+            game.trapList[i].update(game.player.body.GetLinearVelocity());
+        }
     }
-    game.draw();
-    //game.world.DrawDebugData();
-
+    //game.draw();
+    game.world.DrawDebugData();
+    
     requestAnimFrame(game.update);
 }
 
@@ -259,69 +282,68 @@ Game.prototype.checkTraps = function () {
 Game.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
 
+    //this.ctx.save();
+    //this.ctx.translate(-200, 0);
+    //this.ctx.drawImage(game.background, 0, 0, 3499, 479);
+    //this.ctx.restore();
+
+
+    //touches is an array that holds all the touch info
+    //use it e.g. draw a circle around each finger
+    for (var i = 0; i < this.touches.length; i++) {
+        var touch = this.touches[i];
+        if (gameState == GAME) {
+            if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
+                game.player.move('left');
+                console.log("Left arrow touched");
+            }
+            else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
+                game.player.move('right');
+                console.log("Right arrow touched");
+            }
+            else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
+                game.player.jump();
+                //game.audio.play();
+            }
+        }
+        else if (gameState == MENU) {
+            if (touch.clientX > game.menu.playButtonX && touch.clientX < game.menu.playButtonX + game.menu.buttonWidth
+			&& touch.clientY > game.menu.playButtonY && touch.clientY < game.menu.playButtonY + game.menu.buttonHeight) {
+                gameState = GAME;
+                console.log("Play button touched");
+            }
+
+            if (touch.clientX > game.menu.multiplayerButtonX && touch.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
+			&& touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
+                console.log("multiplayer button touched");
+            }
+
+            if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
+			&& touch.clientY > game.menu.optionsButtonY && touch.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) {
+                console.log("options button touched");
+            }
+        }
+        // }
+    }
+
+    if (gameState == GAME) {
+        this.ctx.save();
+
         this.ctx.save();
         this.ctx.translate(-200, 0);
         this.ctx.drawImage(game.background, 0, 0, 3499, 479);
         this.ctx.restore();
 
-
-    //touches is an array that holds all the touch info
-    //use it e.g. draw a circle around each finger
-    for (var i = 0; i < this.touches.length; i++) 
-	{
-        var touch = this.touches[i];
-		if(gameState ==GAME)
-		{
-			if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
-				game.player.move('left');
-				console.log("Left arrow touched");
-			}
-			else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
-				game.player.move('right');
-				console.log("Right arrow touched");
-			}
-			else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-				game.player.jump();
-				//game.audio.play();
-			}
-		}
-		else if(gameState == MENU)
-		{
-			if (touch.clientX > game.menu.playButtonX && touch.clientX < game.menu.playButtonX + game.menu.buttonWidth 
-			&& touch.clientY > game.menu.playButtonY && touch.clientY < game.menu.playButtonY  + game.menu.buttonHeight) 
-			{
-				gameState = GAME;
-				console.log("Play button touched");
-			}
-			
-			if (touch.clientX > game.menu.multiplayerButtonX && touch.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth 
-			&& touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY  + game.menu.buttonHeight) 
-			{
-				console.log("multiplayer button touched");
-			}
-			
-			if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth 
-			&& touch.clientY > game.menu.optionsButtonY && touch.clientY < game.menu.optionsButtonY  + game.menu.buttonHeight) 
-			{
-				console.log("options button touched");
-			}
-		}
-        // }
-    }
-
-    if (gameState == GAME) {
-        //this.ctx.save();
-
-        /*this.ctx.save();
-        this.ctx.translate(-200, 0);
-        this.ctx.drawImage(game.background, 0, 0, 3499, 479);
-        this.ctx.restore();*/
-
         var playerPos = game.player.body.GetPosition();
-        //this.ctx.translate(-playerPos.x * 30, 1)
+       // this.ctx.translate(-playerPos.x * SCALE, 1)
 
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
+            //if (playerPos != game.platforms.prevPlayerPos)
+            //{
+            //    game.platforms[i].updateBody();
+            //    game.platforms[i].prevPlayerPos = playerPos;
+            //}
         }
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].draw();
@@ -399,10 +421,22 @@ function keyDownHandler(e) {
     if (e.keyCode == "68")//up 38, 87 D
     {
         game.player.move('right');
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].updateBody('right');
+        }
+        for (var i = 0; i < game.trapList.length; i++) {
+            game.trapList[i].updateBody('right');
+        }
     }
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].updateBody('left');
+        }
+        for (var i = 0; i < game.trapList.length; i++) {
+            game.trapList[i].updateBody('left');
+        }
         //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
     if (e.keyCode == "32") {

@@ -33,7 +33,6 @@ function Player()
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
 	this.fixDef.shape.SetAsBox((this.SpriteWidth/ 30) /2, (this.SpriteHeight / 30) / 2);
-
 	this.bodyDef.position.x = 100 /30;
 	this.bodyDef.position.y = 100 /30;
 
@@ -122,7 +121,7 @@ Player.prototype.move = function(key)
         if (this.body.IsAwake() == false) {
             this.body.SetAwake(true);
         }
-        this.body.SetLinearVelocity(new b2Vec2(2, this.body.GetLinearVelocity().y));
+        this.body.SetLinearVelocity(new b2Vec2(1, this.body.GetLinearVelocity().y));
 
     }
     else if (key == 'left') {
@@ -133,7 +132,7 @@ Player.prototype.move = function(key)
         if (this.body.IsAwake() == false) {
             this.body.SetAwake(true);
         }
-        this.body.SetLinearVelocity(new b2Vec2(-2, this.body.GetLinearVelocity().y));
+        this.body.SetLinearVelocity(new b2Vec2(-1, this.body.GetLinearVelocity().y));
     }
     //else this.idle = true;
     
@@ -149,7 +148,6 @@ Player.prototype.jump = function()
 }
 Player.prototype.hit = function(impulse, entity)
 {
-
     if(entity == "platform" && this.body.GetLinearVelocity().y < 0)
     {
         this.isJumping = false;
