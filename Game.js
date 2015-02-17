@@ -338,10 +338,22 @@ Game.prototype.draw = function () {
         if (gameState == GAME) {
             if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
                 game.player.move('left');
+                for (var i = 0; i < game.numPlatforms; i++) {
+                    game.platforms[i].updateBody('left');
+                }
+                for (var i = 0; i < game.trapList.length; i++) {
+                    game.trapList[i].updateBody('left');
+                }
                 console.log("Left arrow touched");
             }
             else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
                 game.player.move('right');
+                for (var i = 0; i < game.numPlatforms; i++) {
+                    game.platforms[i].updateBody('right');
+                }
+                for (var i = 0; i < game.trapList.length; i++) {
+                    game.trapList[i].updateBody('right');
+                }
                 console.log("Right arrow touched");
             }
             else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
@@ -433,13 +445,13 @@ Game.prototype.draw = function () {
 function onTouchMove(e) {
     e.preventDefault();
     game.touches = e.touches;
-    game.draw();
+    //game.draw();
 }
 function onTouchStart(e) {
     e.preventDefault();
     game.touches = e.touches;
     //UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
-    game.draw();
+    //game.draw();
 }
 function onTouchEnd(e) {
     game.touches = e.touches;
