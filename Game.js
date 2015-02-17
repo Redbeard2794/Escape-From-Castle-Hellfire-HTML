@@ -79,7 +79,7 @@ function main() {
 
         });
 
-    gameState = GAME;
+    gameState = MENU;
     //stuff for UI(May move it somewhere else after)
     game.jumpButton = new Image();
     game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
@@ -101,9 +101,40 @@ function main() {
 	game.splash = new Image();
 	game.splash.src = 'textures/SplashScreen.png';
 	
+    game.timer = 0;
+    game.secTimer = 0;
+
     game.debug();
 
+    document.addEventListener("mousedown", function(e){game.Clicked(e);});
+
+
     requestAnimFrame(game.update); //kickoff the update cycle
+}
+
+Game.prototype.Clicked = function(e)
+{
+    console.log("Clicked");
+    if(gameState == MENU)
+    {
+        e.preventDefault();
+        if (e.clientX > game.menu.playButtonX && e.clientX < game.menu.playButtonX + game.menu.buttonWidth
+            && e.clientY > game.menu.playButtonY && e.clientY < game.menu.playButtonY + game.menu.buttonHeight) 
+        {
+            console.log("Changing gameState to GAME");
+            gameState = GAME;
+        }
+        else if (e.clientX > game.menu.multiplayerButtonX && e.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
+            && e.clientY > game.menu.multiplayerButtonY && e.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) 
+        {
+            console.log("Multiplayer coming soon");
+        }
+        else if (e.clientX > game.menu.optionsButtonX && e.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
+            && e.clientY > game.menu.optionsButtonY && e.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) 
+        {
+            console.log("options coming soon");
+        }
+    }
 }
 
 function loadLevel(plats) {
@@ -258,9 +289,21 @@ Game.prototype.update = function () {
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].update(game.player.body.GetLinearVelocity());
         }
+        if(game.secTimer < 60)
+        {
+            game.secTimer+=1;
+        }
+        else
+        {
+            game.secTimer = 0;
+            game.timer+=1;
+        }
+
     }
-    //game.draw();
-    game.world.DrawDebugData();
+
+
+    game.draw();
+    //game.world.DrawDebugData();
     
     requestAnimFrame(game.update);
 }
@@ -366,6 +409,10 @@ Game.prototype.draw = function () {
         this.ctx.drawImage(game.rightArrow, 0, 0, 178, 84);
         this.ctx.restore();
 
+
+        this.ctx.font = "30px Arial";
+        this.ctx.fillText("Time: " + game.timer,25,30);
+        this.ctx.fillText("Deaths: ", 25, 60)
 
         game.player.draw();
     }

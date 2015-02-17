@@ -8,7 +8,7 @@ function Menu()
 	this.multiplayerButton.src = 'textures/menuButtons/multiplayerButton.png';
 	
 	this.playButtonX = 300;
-	this.playerButtonY = 50;
+	this.playButtonY = 50;
 	
 	this.multiplayerButtonX = 300;
 	this.multiplayerButtonY = 250;
@@ -25,7 +25,7 @@ Menu.prototype.update = function()
 }
 Menu.prototype.draw = function()
 {
-    game.ctx.drawImage(this.playButton, this.playButtonX, this.playerButtonY, this.buttonWidth, this.buttonHeight);
+    game.ctx.drawImage(this.playButton, this.playButtonX, this.playButtonY, this.buttonWidth, this.buttonHeight);
 	game.ctx.drawImage(this.multiplayerButton, this.multiplayerButtonX, this.multiplayerButtonY, this.buttonWidth, this.buttonHeight);
     game.ctx.drawImage(this.optionsButton, this.optionsButtonX, this.optionsButtonY, this.buttonWidth, this.buttonHeight);
 }
