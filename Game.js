@@ -81,7 +81,7 @@ function main() {
 
         });
 
-    gameState = MENU;
+    gameState = SPLASH;
     //stuff for UI(May move it somewhere else after)
     game.jumpButton = new Image();
     game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
@@ -137,6 +137,14 @@ Game.prototype.Clicked = function(e)
             console.log("options coming soon");
         }
     }
+		else if(gameState == SPLASH)
+		{
+			if (e.clientX > 0 && e.clientX < 800
+				&& e.clientY > 0 && e.clientY < 800) 
+				{
+					gameState = MENU;
+				}
+		}
 }
 
 function loadLevel(plats) {
@@ -291,7 +299,7 @@ Game.prototype.update = function () {
 
         game.world.ClearForces();
         game.checkTraps();
-        game.player.update();
+        game.player.update(currentLevel);
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].update(game.player.body.GetLinearVelocity());
         }
@@ -366,7 +374,7 @@ Game.prototype.draw = function () {
                 console.log("Right arrow touched");
             }
             else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-                game.player.jump();
+                game.player.jump(currentLevel);
                 //game.audio.play();
             }
         }
@@ -387,6 +395,13 @@ Game.prototype.draw = function () {
                 console.log("options button touched");
             }
         }
+		else if(gameState == SPLASH)
+		{
+		    if (touch.clientX > 0 && touch.clientX < 800
+			&& touch.clientY > 0 && touch.clientY < 800) {
+                gameState = MENU;
+            }
+		}
         // }
     }
 
@@ -435,7 +450,7 @@ Game.prototype.draw = function () {
         this.ctx.fillText("Time: " + game.timer,25,30);
         this.ctx.fillText("Deaths: ", 25, 60)
 
-        game.player.draw();
+        game.player.draw(currentLevel);
     }
     else if (gameState == MENU) {
         game.menu.draw();
@@ -508,7 +523,7 @@ function keyDownHandler(e) {
         //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
     }
     if (e.keyCode == "32") {
-        game.player.jump();
+        game.player.jump(currentLevel);
     }
 	
 	//for testing purposes only
