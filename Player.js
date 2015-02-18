@@ -9,6 +9,10 @@ function Player()
     this.spriteSheetLeftIdle = new Image();
     this.moved = false;
     
+	//horse sprite
+	this.horseSpriteSheet = new Image();
+	this.horseSpriteSheet.src = 'textures/Player/playerOnHorse.png';
+	
     //sources of each sprite sheet
     this.spriteSheet.src = 'textures/player/PlayerRightFinal.png';
     this.spriteSheetLeftWalk.src = 'textures/player/PlayerLeftFinal.png';

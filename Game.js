@@ -10,6 +10,8 @@ var SCALE = 30
 var SPLASH = 0, MENU = 1, GAME = 2;
 var gameState;
 
+var currentLevel = 1;
+
 function main() {
     game = new Game();
     init(); //initalize Box2D world (all object creation must be done after this)
@@ -108,7 +110,7 @@ function main() {
 
     document.addEventListener("mousedown", function(e){game.Clicked(e);});
 
-
+	
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
@@ -139,8 +141,15 @@ Game.prototype.Clicked = function(e)
 
 function loadLevel(plats) {
 	//loads from external xml file
-
-    xmlDoc=loadXMLDoc("levels/Level1.xml");
+	console.log(currentLevel);
+	if(currentLevel == 1)
+	{
+		xmlDoc=loadXMLDoc("levels/Level1.xml");
+	}
+	else if(currentLevel == 2)
+	{
+		xmlDoc=loadXMLDoc("levels/Level2.xml");
+	}
     for (var i = 0; i < game.numPlatforms; i++) {
         var x;
         var y;
