@@ -16,19 +16,9 @@ function main() {
     game = new Game();
     init(); //initalize Box2D world (all object creation must be done after this)
     //listeners
+    game.hitExit = false;
     game.menu = new Menu();
-    game.numPlatforms = 18;
-    game.player = new Player();
-    game.platforms = [];
-    game.trapList = [];
-
-    var trap1 = new proxTrap(new b2Vec2(450, 0));
-    var trap2 = new proxTrap(new b2Vec2(1080, 0));
-    var trap3 = new proxTrap(new b2Vec2(1220, 0));
-
-    game.trapList[game.trapList.length] = trap1;
-    game.trapList[game.trapList.length] = trap2;
-    game.trapList[game.trapList.length] = trap3;
+    
 
     //load the platforms(for now)
     loadLevel();
@@ -47,20 +37,22 @@ function main() {
             BeginContact: function (idA, idB) {
             },
 
-            //PreSolve: function (contact, oldManifold) {
-            //    contact.SetEnabled(false);
-            //    var bodyA = contact.GetFixtureA().GetBody();
-            //    var bodyB = contact.GetFixtureB().GetBody();
-            //    if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform')
-            //    {
-            //        bodyA.SetLinearVelocity(new b2Vec2(bodyA.GetLinearVelocity().x, -1));
-            //        bodyA.GetOwner().hit(null, bodyB.GetUserData());
-            //    }
-            //    else if (bodyB.GetUserData() == 'player' && bodyA.GetUserData() == 'platform') {
-            //        bodyB.SetLinearVelocity(new b2Vec2(bodyB.GetLinearVelocity().x, -1));
-            //        bodyB.GetOwner().hit(null, bodyA.GetUserData());
-            //    }
-            //},
+            PreSolve: function (contact, oldManifold) {
+                var bodyA = contact.GetFixtureA().GetBody();
+                var bodyB = contact.GetFixtureB().GetBody();
+                if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'exit' ||
+                    bodyA.GetUserData() == 'exit' && bodyB.GetUserData() == 'player')
+                {
+                    if (!game.hitExit) {
+                        currentLevel++;
+                        destroyLevel();
+                        game.hitExit = true;
+                    }
+                    else {
+                        contact.SetEnabled(false);
+                    }
+                }
+            },
             PostSolve: function (bodyA, bodyB, impulse) {
                 if (impulse < 0.1) { return; } // playing with thresholds
                 if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform' ||
@@ -77,6 +69,10 @@ function main() {
                     bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
                     bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
                 }
+                else if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'exit' ||
+                   bodyA.GetUserData() == 'exit' && bodyB.GetUserData() == 'player') {
+                    
+                }
             }
 
         });
@@ -89,6 +85,7 @@ function main() {
     game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
     game.rightArrow = new Image();
     game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
+
 
     game.leftArrowX = 0;
     game.leftArrowY = 395;
@@ -140,15 +137,39 @@ Game.prototype.Clicked = function(e)
 }
 
 function loadLevel(plats) {
-	//loads from external xml file
+    //loads from external xml file
 	console.log(currentLevel);
 	if(currentLevel == 1)
 	{
-		xmlDoc=loadXMLDoc("levels/Level1.xml");
+	    xmlDoc = loadXMLDoc("levels/Level1.xml");
+	    game.numPlatforms = 18;
+	    game.player = new Player();
+	    game.trapList = [];
+	    game.exit = new Exit(2320, 5);
+
+	    var trap1 = new proxTrap(new b2Vec2(450, 0));
+	    var trap2 = new proxTrap(new b2Vec2(1080, 0));
+	    var trap3 = new proxTrap(new b2Vec2(1220, 0));
+
+	    game.trapList[game.trapList.length] = trap1;
+	    game.trapList[game.trapList.length] = trap2;
+	    game.trapList[game.trapList.length] = trap3;
 	}
 	else if(currentLevel == 2)
 	{
-		xmlDoc=loadXMLDoc("levels/Level2.xml");
+	    xmlDoc = loadXMLDoc("levels/Level2.xml");
+	    game.numPlatforms = 18;
+	    game.player = new Player();
+	    game.trapList = [];
+	    game.exit = new Exit(2550, 100);
+
+	    var trap1 = new proxTrap(new b2Vec2(450, 0));
+	    var trap2 = new proxTrap(new b2Vec2(1080, 0));
+	    var trap3 = new proxTrap(new b2Vec2(1220, 0));
+
+	    game.trapList[game.trapList.length] = trap1;
+	    game.trapList[game.trapList.length] = trap2;
+	    game.trapList[game.trapList.length] = trap3;
 	}
     for (var i = 0; i < game.numPlatforms; i++) {
         var x;
@@ -159,8 +180,8 @@ function loadLevel(plats) {
 
         game.platforms[game.platforms.length] = new Platform(x, y);
     }
-
-
+   
+    game.hitExit = false;
 }
 
 //for loading from an external xml file
@@ -290,8 +311,13 @@ Game.prototype.update = function () {
 	  );
 
         game.world.ClearForces();
+        if (game.hitExit)
+        {
+            loadLevel();
+        }
         game.checkTraps();
         game.player.update();
+        game.exit.update(game.player.body.GetLinearVelocity());
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].update(game.player.body.GetLinearVelocity());
         }
@@ -347,6 +373,7 @@ Game.prototype.draw = function () {
         if (gameState == GAME) {
             if (touch.clientX > this.leftArrowX && touch.clientX < this.leftArrowX + 178 && touch.clientY > this.leftArrowY && touch.clientY < this.leftArrowY + 479) {
                 game.player.move('left');
+                game.exit.Move('left');
                 for (var i = 0; i < game.numPlatforms; i++) {
                     game.platforms[i].updateBody('left');
                 }
@@ -357,6 +384,7 @@ Game.prototype.draw = function () {
             }
             else if (touch.clientX > this.rightArrowX && touch.clientX < this.rightArrowX + 678 && touch.clientY > this.rightArrowY && touch.clientY < this.rightArrowY + 479) {
                 game.player.move('right');
+                game.exit.Move('right');
                 for (var i = 0; i < game.numPlatforms; i++) {
                     game.platforms[i].updateBody('right');
                 }
@@ -391,28 +419,22 @@ Game.prototype.draw = function () {
     }
 
     if (gameState == GAME) {
-        this.ctx.save();
+        //this.ctx.save();
 
         this.ctx.save();
         this.ctx.translate(-200, 0);
         this.ctx.drawImage(game.background, 0, 0, 3499, 479);
         this.ctx.restore();
 
-        var playerPos = game.player.body.GetPosition();
-       // this.ctx.translate(-playerPos.x * SCALE, 1)
+        //var playerPos = game.player.body.GetPosition();
 
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].draw();
-            //if (playerPos != game.platforms.prevPlayerPos)
-            //{
-            //    game.platforms[i].updateBody();
-            //    game.platforms[i].prevPlayerPos = playerPos;
-            //}
         }
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].draw();
         }
-       // this.ctx.restore();
+        game.exit.draw();
 
         this.ctx.save();
         this.ctx.translate(game.jumpX, game.jumpY);
@@ -489,6 +511,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "68")//up 38, 87 D
     {
         game.player.move('right');
+        game.exit.Move('right');
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].updateBody('right');
         }
@@ -499,6 +522,7 @@ function keyDownHandler(e) {
     if (e.keyCode == "65")//down 40, 83 A
     {
         game.player.move('left');
+        game.exit.Move('left');
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].updateBody('left');
         }
@@ -519,6 +543,15 @@ function keyDownHandler(e) {
 	
 }
 
+
+function destroyLevel() {
+    delete game.platforms;
+    delete game.trapList;
+    game.platforms = [];
+    game.trapList = [];
+    delete game.player;
+    delete game.exit;
+}
 //Utilities
 /*function that provides access to request animation frame on all browsers */
 window.requestAnimFrame = (function () {

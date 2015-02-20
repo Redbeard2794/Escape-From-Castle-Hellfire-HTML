@@ -18,7 +18,7 @@ function Platform(posX,posY)
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
 	this.fixDef.shape.SetAsBox((this.SpriteWidth / SCALE), (this.SpriteHeight / SCALE));
-
+    
 	this.bodyDef.position.x = posX / SCALE;
 	this.bodyDef.position.y = posY / SCALE;
 
