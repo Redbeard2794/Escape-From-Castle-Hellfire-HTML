@@ -45,12 +45,23 @@ function main() {
                 {
                     if (!game.hitExit) {
                         currentLevel++;
-                        destroyLevel();
                         game.hitExit = true;
                     }
                     else {
                         contact.SetEnabled(false);
                     }
+                }
+                else if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'ground' ||
+                    bodyA.GetUserData() == 'ground' && bodyB.GetUserData() == 'player')
+                {
+                    if(!game.hitExit){
+                        game.hitExit = true;
+                        game.deaths+=1;
+                    }
+                    else{
+                        contact.SetEnabled(false);
+                    }
+                    
                 }
             },
             PostSolve: function (bodyA, bodyB, impulse) {
@@ -68,11 +79,10 @@ function main() {
                     bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform') {
                     bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
                     bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
-                }
-                else if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'exit' ||
-                   bodyA.GetUserData() == 'exit' && bodyB.GetUserData() == 'player') {
-                    
-                }
+                } 
+
+
+                
             }
 
         });
@@ -102,6 +112,8 @@ function main() {
 	
     game.timer = 0;
     game.secTimer = 0;
+
+    game.deaths = 0;
 
     game.debug();
 
@@ -153,6 +165,7 @@ function loadLevel(plats) {
 	    game.numPlatforms = 18;
 	    game.player = new Player();
 	    game.trapList = [];
+        game.platforms = [];
 	    game.exit = new Exit(2320, 5);
 
 	    var trap1 = new proxTrap(new b2Vec2(450, 0));
@@ -169,6 +182,7 @@ function loadLevel(plats) {
 	    game.numPlatforms = 18;
 	    game.player = new Player();
 	    game.trapList = [];
+        game.platforms = [];
 	    game.exit = new Exit(2550, 100);
 
 	    var trap1 = new proxTrap(new b2Vec2(450, 0));
@@ -321,6 +335,7 @@ Game.prototype.update = function () {
         game.world.ClearForces();
         if (game.hitExit)
         {
+            destroyLevel();
             loadLevel();
         }
         game.checkTraps();
@@ -472,7 +487,7 @@ Game.prototype.draw = function () {
 
         this.ctx.font = "30px Arial";
         this.ctx.fillText("Time: " + game.timer,25,30);
-        this.ctx.fillText("Deaths: ", 25, 60)
+        this.ctx.fillText("Deaths: "+ game.deaths, 25, 60)
 
         game.player.draw(currentLevel);
     }
@@ -505,49 +520,50 @@ function onTouchEnd(e) {
     game.touches = e.touches;
 }
 
-//function UITouched()
-//{
-//    for (var i = 0; i < this.touches.length; i++) {
-//        var touch = this.touches[i];
-//        if (touch.clientX > 0 && touch.clientX < 178 && touch.clientY > 395 && touch.clientY < 479) {
-//            game.player.move('left');
-//            console.log("Left arrow touched");
-//        }
-//        else if (touch.clientX > 500 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-//            game.player.move('right');
-//            console.log("Right arrow touched");
-//        }
-//        else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-//            game.player.jump();
-//        }
-//    }
-//}
-
 function keyDownHandler(e) {
 
-    if (e.keyCode == "68")//up 38, 87 D
+    if(currentLevel == 1)
     {
-        game.player.move('right');
-        game.exit.Move('right');
-        for (var i = 0; i < game.numPlatforms; i++) {
-            game.platforms[i].updateBody('right');
+        if (e.keyCode == "68")//up 38, 87 D
+        {
+            game.player.move('right');
+            game.exit.Move('right');
+            for (var i = 0; i < game.numPlatforms; i++) {
+                game.platforms[i].updateBody('right');
+            }
+            for (var i = 0; i < game.trapList.length; i++) {
+                game.trapList[i].updateBody('right');
+            }
         }
-        for (var i = 0; i < game.trapList.length; i++) {
-            game.trapList[i].updateBody('right');
+        if (e.keyCode == "65")//down 40, 83 A
+        {
+            game.player.move('left');
+            game.exit.Move('left');
+            for (var i = 0; i < game.numPlatforms; i++) {
+                game.platforms[i].updateBody('left');
+            }
+            for (var i = 0; i < game.trapList.length; i++) {
+                game.trapList[i].updateBody('left');
+            }
+            //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
         }
     }
-    if (e.keyCode == "65")//down 40, 83 A
+
+    else if(currentLevel == 2)
     {
-        game.player.move('left');
-        game.exit.Move('left');
-        for (var i = 0; i < game.numPlatforms; i++) {
-            game.platforms[i].updateBody('left');
-        }
-        for (var i = 0; i < game.trapList.length; i++) {
-            game.trapList[i].updateBody('left');
-        }
-        //game.audio.play();//MAKE SURE TO REMOVE AS IT IS FUCKING ANNOYING
+        //if (e.keyCode == "68")//up 38, 87 D
+        //{
+            game.player.move('right');
+            game.exit.Move('right');
+            for (var i = 0; i < game.numPlatforms; i++) {
+                game.platforms[i].updateBody('right');
+            }
+            for (var i = 0; i < game.trapList.length; i++) {
+                game.trapList[i].updateBody('right');
+            }
+        //}
     }
+
     if (e.keyCode == "32") {
         game.player.jump(currentLevel);
     }
@@ -562,11 +578,19 @@ function keyDownHandler(e) {
 
 
 function destroyLevel() {
+
+    for (var i = 0; i < game.numPlatforms; i++) {
+        game.world.DestroyBody(game.platforms[i].body);
+    }
+    for (var i = 0; i < game.trapList.length; i++) {
+        game.world.DestroyBody(game.trapList[i].body);
+    }
+
     delete game.platforms;
     delete game.trapList;
-    game.platforms = [];
-    game.trapList = [];
+    game.world.DestroyBody(game.player.body);
     delete game.player;
+    game.world.DestroyBody(game.exit.body);
     delete game.exit;
 }
 //Utilities

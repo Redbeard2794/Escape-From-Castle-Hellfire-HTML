@@ -40,7 +40,7 @@ function Player()
 	this.bodyDef.owner = this;
 	this.fixDef.shape = new b2PolygonShape;
 	this.fixDef.shape.SetAsBox((this.SpriteWidth/ 30) /2, (this.SpriteHeight / 30) / 2);
-	this.bodyDef.position.x = 100 /30;
+	this.bodyDef.position.x = 250 /30;
 	this.bodyDef.position.y = 100 /30;
 
 	this.body = game.world.CreateBody(this.bodyDef);
@@ -55,7 +55,7 @@ function Player()
 	
 	this.bodyDef2 = new b2BodyDef;
 	this.bodyDef2.type = b2Body.b2_dynamicBody;
-	this.bodyDef2.userData = 'horse';
+	this.bodyDef2.userData = 'player';
 	this.bodyDef2.owner = this;
 	this.fixDef2.shape = new b2PolygonShape;
 	this.fixDef2.shape.SetAsBox((this.horseSpriteWidth/ 30) /2, (this.horseSpriteHeight / 30) / 2);
