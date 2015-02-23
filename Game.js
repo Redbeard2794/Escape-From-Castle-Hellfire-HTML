@@ -228,13 +228,6 @@ function loadLevel(plats) {
         game.platforms = [];
         game.exit = new Exit(2550, 100);
 
-        var trap1 = new proxTrap(new b2Vec2(450, 0));
-        var trap2 = new proxTrap(new b2Vec2(1080, 0));
-        var trap3 = new proxTrap(new b2Vec2(1220, 0));
-
-        game.trapList[game.trapList.length] = trap1;
-        game.trapList[game.trapList.length] = trap2;
-        game.trapList[game.trapList.length] = trap3;
     }
     for (var i = 0; i < game.numPlatforms; i++) {
         var x;

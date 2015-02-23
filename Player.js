@@ -154,7 +154,8 @@ Player.prototype.update = function(currentLevel)
 			this.updateSprite1 = 0;
 		}
 		
-		//make the horse move constantly here
+	    //make the horse move constantly here
+		this.body.SetLinearVelocity(new b2Vec2(1, this.body.GetLinearVelocity().y));
 		
 	}
     //console.log("moving "+this.moving)
@@ -163,38 +164,50 @@ Player.prototype.update = function(currentLevel)
 
 Player.prototype.move = function(key)
 {
-    if (key == 'right') {
-        this.right = true;
-        this.moving = true;
-        this.idle = false;
-        this.currentSprite = this.spriteSheet;
-        if (this.body.IsAwake() == false) {
-            this.body.SetAwake(true);
-        }
-        this.body.SetLinearVelocity(new b2Vec2(1, this.body.GetLinearVelocity().y));
+    if (game.currentLevel == 1) {
+        if (key == 'right') {
+            this.right = true;
+            this.moving = true;
+            this.idle = false;
+            this.currentSprite = this.spriteSheet;
+            if (this.body.IsAwake() == false) {
+                this.body.SetAwake(true);
+            }
+            this.body.SetLinearVelocity(new b2Vec2(1, this.body.GetLinearVelocity().y));
 
-    }
-    else if (key == 'left') {
-        this.right = false;
-        this.moving = true;
-        this.idle = false;
-        this.currentSprite = this.spriteSheetLeftWalk;
-        if (this.body.IsAwake() == false) {
-            this.body.SetAwake(true);
         }
-        this.body.SetLinearVelocity(new b2Vec2(-1, this.body.GetLinearVelocity().y));
+        else if (key == 'left') {
+            this.right = false;
+            this.moving = true;
+            this.idle = false;
+            this.currentSprite = this.spriteSheetLeftWalk;
+            if (this.body.IsAwake() == false) {
+                this.body.SetAwake(true);
+            }
+            this.body.SetLinearVelocity(new b2Vec2(-1, this.body.GetLinearVelocity().y));
+        }
     }
     //else this.idle = true;
     
 }
 
 Player.prototype.jump = function (currentLevel) {
-    if (!this.isJumping) {
-        var pos = this.body.GetPosition();
-        this.body.ApplyImpulse(new b2Vec2(0, 175), pos);
-        this.isJumping = true;
-    }
 
+    if (game.currentLevel == 1) {
+        if (!this.isJumping) {
+            var pos = this.body.GetPosition();
+            this.body.ApplyImpulse(new b2Vec2(0, 175), pos);
+            this.isJumping = true;
+        }
+    }
+    else if (game.currentLevel == 2) {
+        if (!this.isJumping) {
+            var pos = this.body.GetPosition();
+            this.body.ApplyImpulse(new b2Vec2(0, 400), pos);
+            this.isJumping = true;
+        }
+
+    }
 }
 Player.prototype.hit = function(impulse, entity)
 {

@@ -64,12 +64,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 					if i is not self.request.remote_ip:
 						players[i].write_message(message)
 						
-			elif m["type"] == "updateTrap":
+			elif m["type"] == "placeTrap":
 				print("Sending trap position")
 				for i in players:
 					if i is not self.request.remote_ip:
 						players[i].write_message(message)
-			
+						
+			elif m["type"] == "trapHit":
+				print("Sending killed message")
+				for i in players:
+					if i is not self.request.remote_ip:
+						players[i].write_message(message)
+						
 		"""elif len(players) == 1:
 			m=json.loads(message)
 			if m["type"] == "updateState":
