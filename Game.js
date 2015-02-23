@@ -7,7 +7,7 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30
 
-var url = "ws://149.153.102.20:8080/wstest";
+var url = "ws://149.153.102.24:8080/wstest";
 var ws = new WebSocket(url);
 
 var SPLASH = 0, MENU = 1, GAME = 2, MULTIPLAYER = 3;

@@ -26,7 +26,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 			print(len(players))#print the number of players
 			self.handleMessage(message)
 
-		elif len(players) == 1 and len(players) < 2:
+		elif len(players) == 1:
 			m = json.loads(message)
 			if m["type"] == "join":
 				players[self.request.remote_ip] = self
