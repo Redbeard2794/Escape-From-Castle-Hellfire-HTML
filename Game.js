@@ -7,7 +7,7 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30
 
-var url = "ws://149.153.102.24:8080/wstest";
+var url = "ws://149.153.102.20:8080/wstest";
 var ws = new WebSocket(url);
 
 var SPLASH = 0, MENU = 1, GAME = 2, MULTIPLAYER = 3;
@@ -170,13 +170,15 @@ Game.prototype.Clicked = function (e) {
             && e.clientY > game.menu.playButtonY && e.clientY < game.menu.playButtonY + game.menu.buttonHeight) {
             console.log("Changing gameState to GAME");
             gameState = GAME;
+            game.currentLevel = 1;
             game.setUpSinglePlayer();
         }
         else if (e.clientX > game.menu.multiplayerButtonX && e.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
             && e.clientY > game.menu.multiplayerButtonY && e.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
             console.log("Multiplayer arriving now");
-            gameState = MULTIPLAYER;
+            game.currentLevel == 1;
             game.setUpMultiplayer();
+            gameState = MULTIPLAYER;
         }
         else if (e.clientX > game.menu.optionsButtonX && e.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
             && e.clientY > game.menu.optionsButtonY && e.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) {
@@ -471,6 +473,7 @@ Game.prototype.draw = function () {
                 console.log("Play button touched");
                 console.log("Changing gameState to GAME");
                 gameState = GAME;
+                game.currentLevel == 1;
                 game.setUpSinglePlayer();
             }
         }
@@ -479,8 +482,10 @@ Game.prototype.draw = function () {
         && touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
             console.log("multiplayer button touched");
             console.log("Multiplayer arriving now");
-            gameState = MULTIPLAYER;
+            
+            game.currentLevel == 1;
             game.setUpMultiplayer();
+            gameState = MULTIPLAYER;
         }
 
         if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
@@ -610,10 +615,12 @@ Game.prototype.setUpSinglePlayer = function () {
 };
 
 Game.prototype.setUpMultiplayer = function () {
-    var msg = {}
+    var msg = {};
     msg.type = "join";
 
     ws.send(JSON.stringify(msg));
+
+    //loadLevel();
 };
 
 function onTouchMove(e) {
