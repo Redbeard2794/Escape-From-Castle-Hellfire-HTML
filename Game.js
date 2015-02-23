@@ -7,10 +7,53 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30
 
-var SPLASH = 0, MENU = 1, GAME = 2;
+var url = "ws://127.0.0.1:8080";
+var ws = new WebSocket(url);
+
+var SPLASH = 0, MENU = 1, GAME = 2, MULTIPLAYER = 3;
 var gameState;
 
 var currentLevel = 1;
+
+ws.onopen = function () {
+    var msg = {}
+    msg.type = "join";
+
+    ws.send(JSON.stringify(msg));
+}
+ws.onmessage = function (evt) {
+    message = JSON.parse(evt.data);
+    if (message.type == "waiting") {
+        alert("Waiting for Players");
+        console.log("W");
+    }
+    else if (message.type == "gamestart") {
+        alert("Starting game");
+        console.log("GS");
+    }
+    else if (message.type == "gamefull") {
+        alert("Game is Full");
+        console.log("GF");
+    }
+    else if (message.type == "updateState") {
+        setPlayerPos(message.X, message.Y);
+    }
+    else if (message.type == "level clear") {
+        endLevel();
+    }
+    else if (message.type == "death") {
+        updateDeathCount();
+    }
+}
+ws.sendTrapMessage = function (posX, posY) {
+    var msg = {};
+    msg.type = "updateTrap"
+    msg.data = {};
+    msg.data.x = posX;
+    msg.data.y = posY;
+    ws.send(JSON.stringify(msg));
+};
+
 
 function main() {
     game = new Game();
@@ -21,7 +64,7 @@ function main() {
     
 
     //load the platforms(for now)
-    loadLevel();
+   
     //audio
     //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
     //game.audio = document.createElement("audio");
@@ -89,20 +132,7 @@ function main() {
 
     gameState = SPLASH;
     //stuff for UI(May move it somewhere else after)
-    game.jumpButton = new Image();
-    game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
-    game.leftArrow = new Image();
-    game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
-    game.rightArrow = new Image();
-    game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
-
-
-    game.leftArrowX = 0;
-    game.leftArrowY = 395;
-    game.rightArrowX = 500;
-    game.rightArrowY = 395;
-    game.jumpX = 190;
-    game.jumpY = 410;
+    
 
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
@@ -123,38 +153,45 @@ function main() {
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
-Game.prototype.Clicked = function(e)
-{
+Game.prototype.Clicked = function (e) {
     console.log("Clicked");
-    if(gameState == MENU)
-    {
+    if (gameState == MENU) {
         e.preventDefault();
         if (e.clientX > game.menu.playButtonX && e.clientX < game.menu.playButtonX + game.menu.buttonWidth
-            && e.clientY > game.menu.playButtonY && e.clientY < game.menu.playButtonY + game.menu.buttonHeight) 
-        {
+            && e.clientY > game.menu.playButtonY && e.clientY < game.menu.playButtonY + game.menu.buttonHeight) {
             console.log("Changing gameState to GAME");
             gameState = GAME;
+            game.setUpSinglePlayer();
         }
         else if (e.clientX > game.menu.multiplayerButtonX && e.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
-            && e.clientY > game.menu.multiplayerButtonY && e.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) 
-        {
-            console.log("Multiplayer coming soon");
+            && e.clientY > game.menu.multiplayerButtonY && e.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
+            console.log("Multiplayer arriving now");
+            gameState = MULTIPLAYER;
+            game.setUpMultiplayer();
         }
         else if (e.clientX > game.menu.optionsButtonX && e.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
-            && e.clientY > game.menu.optionsButtonY && e.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) 
-        {
+            && e.clientY > game.menu.optionsButtonY && e.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) {
             console.log("options coming soon");
         }
     }
-		else if(gameState == SPLASH)
-		{
-			if (e.clientX > 0 && e.clientX < 800
-				&& e.clientY > 0 && e.clientY < 800) 
-				{
-					gameState = MENU;
-				}
-		}
+    else if (gameState == SPLASH) {
+        if (e.clientX > 0 && e.clientX < 800
+            && e.clientY > 0 && e.clientY < 800) {
+            gameState = MENU;
+        }
+    }
+    else if (gameState == MULTIPLAYER) {
+        game.spawnTrap(e.clientX, e.clientY);
+    }
 }
+Game.prototype.spawnTrap = function(posX,posY)
+{
+    var trap = new proxTrap(new b2Vec2(posX, posY));
+    game.trapList[game.trapList.length] = trap;
+
+    ws.sendTrapMessage(posX,posY);
+}
+
 
 function loadLevel(plats) {
     //loads from external xml file
@@ -172,7 +209,7 @@ function loadLevel(plats) {
 	    var trap2 = new proxTrap(new b2Vec2(1080, 0));
 	    var trap3 = new proxTrap(new b2Vec2(1220, 0));
 
-	    game.trapList[game.trapList.length] = trap1;
+	    
 	    game.trapList[game.trapList.length] = trap2;
 	    game.trapList[game.trapList.length] = trap3;
 	}
@@ -247,6 +284,8 @@ function init() {
 
 }; // init()
 
+
+
 Game.prototype.debug = function () {
     this.debugDraw = new b2DebugDraw();
     this.debugDraw.SetSprite(this.ctx);
@@ -267,7 +306,7 @@ function Game() {
     this.initCanvas();
     this.initTouch();
 
-}
+};
 
 Game.prototype.loadAssets = function () {
     //game.audio.src = "sounds/wilhelmScream.ogg";
@@ -275,7 +314,7 @@ Game.prototype.loadAssets = function () {
     game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
     game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
     game.background.src = 'textures/level1Background.png';
-}
+};
 
 Game.prototype.addContactListener = function (callbacks) {
     var listener = new Box2D.Dynamics.b2ContactListener;
@@ -296,7 +335,7 @@ Game.prototype.addContactListener = function (callbacks) {
         callbacks.PreSolve(contact, oldManifold);
     }
     this.world.SetContactListener(listener);
-}
+};
 Game.prototype.initCanvas = function () {
     //create a canvas element
     this.canvas = document.createElement('canvas');
@@ -310,7 +349,7 @@ Game.prototype.initCanvas = function () {
     //make a full screen canvas to draw on
     this.canvas.width = this.screenWidth;
     this.canvas.height = this.screenHeight;
-}
+};
 Game.prototype.initTouch = function () {
     //1. is this running in a touch capable environment?
     touchable = 'createTouch' in document;
@@ -322,7 +361,7 @@ Game.prototype.initTouch = function () {
         this.canvas.addEventListener('touchend', onTouchEnd, false);
     }
 
-}
+};
 
 Game.prototype.update = function () {
     if (gameState == GAME) {
@@ -333,8 +372,7 @@ Game.prototype.update = function () {
 	  );
 
         game.world.ClearForces();
-        if (game.hitExit)
-        {
+        if (game.hitExit) {
             destroyLevel();
             loadLevel();
         }
@@ -349,14 +387,12 @@ Game.prototype.update = function () {
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].update(game.player.body.GetLinearVelocity());
         }
-        if(game.secTimer < 60)
-        {
-            game.secTimer+=1;
+        if (game.secTimer < 60) {
+            game.secTimer += 1;
         }
-        else
-        {
+        else {
             game.secTimer = 0;
-            game.timer+=1;
+            game.timer += 1;
         }
 
     }
@@ -364,9 +400,9 @@ Game.prototype.update = function () {
 
     game.draw();
     //game.world.DrawDebugData();
-    
+
     requestAnimFrame(game.update);
-}
+};
 
 
 Game.prototype.checkTraps = function () {
@@ -380,7 +416,7 @@ Game.prototype.checkTraps = function () {
             theList[i].Trigger();
         }
     }
-}
+};
 
 Game.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
@@ -440,13 +476,12 @@ Game.prototype.draw = function () {
                 console.log("options button touched");
             }
         }
-		else if(gameState == SPLASH)
-		{
-		    if (touch.clientX > 0 && touch.clientX < 800
+        else if (gameState == SPLASH) {
+            if (touch.clientX > 0 && touch.clientX < 800
 			&& touch.clientY > 0 && touch.clientY < 800) {
                 gameState = MENU;
             }
-		}
+        }
         // }
     }
 
@@ -486,44 +521,65 @@ Game.prototype.draw = function () {
 
 
         this.ctx.font = "30px Arial";
-        this.ctx.fillText("Time: " + game.timer,25,30);
-        this.ctx.fillText("Deaths: "+ game.deaths, 25, 60)
+        this.ctx.fillText("Time: " + game.timer, 25, 30);
+        this.ctx.fillText("Deaths: " + game.deaths, 25, 60)
 
         game.player.draw(currentLevel);
     }
     else if (gameState == MENU) {
         game.menu.draw();
     }
-	
-	else if (gameState == SPLASH)
-	{
-		this.ctx.save();
+
+    else if (gameState == SPLASH) {
+        this.ctx.save();
         this.ctx.translate(200, 200);
         this.ctx.drawImage(game.splash, 0, 0, 517, 198);
         this.ctx.restore();
-	}
+    }
 
-}
+};
+
+Game.prototype.setUpSinglePlayer = function () {
+    game.jumpButton = new Image();
+    game.jumpButton.src = 'textures/UiButtons/JumpButton.png';
+    game.leftArrow = new Image();
+    game.leftArrow.src = 'textures/UiButtons/SourceArrowTQLeft.png';
+    game.rightArrow = new Image();
+    game.rightArrow.src = 'textures/UiButtons/SourceArrowTQ.png';
+
+
+    game.leftArrowX = 0;
+    game.leftArrowY = 395;
+    game.rightArrowX = 500;
+    game.rightArrowY = 395;
+    game.jumpX = 190;
+    game.jumpY = 410;
+
+    loadLevel();
+};
+
+Game.prototype.setUpMultiplayer = function () {
+
+};
 
 function onTouchMove(e) {
     e.preventDefault();
     game.touches = e.touches;
     //game.draw();
-}
+};
 function onTouchStart(e) {
     e.preventDefault();
     game.touches = e.touches;
     //UITouched();//calls the method to check if the touch occurred within a UI element e.g. jump button
     //game.draw();
-}
+};
 function onTouchEnd(e) {
     game.touches = e.touches;
-}
+};
 
 function keyDownHandler(e) {
 
-    if(currentLevel == 1)
-    {
+    if (currentLevel == 1) {
         if (e.keyCode == "68")//up 38, 87 D
         {
             game.player.move('right');
@@ -549,32 +605,30 @@ function keyDownHandler(e) {
         }
     }
 
-    else if(currentLevel == 2)
-    {
+    else if (currentLevel == 2) {
         //if (e.keyCode == "68")//up 38, 87 D
         //{
-            game.player.move('right');
-            game.exit.Move('right');
-            for (var i = 0; i < game.numPlatforms; i++) {
-                game.platforms[i].updateBody('right');
-            }
-            for (var i = 0; i < game.trapList.length; i++) {
-                game.trapList[i].updateBody('right');
-            }
+        game.player.move('right');
+        game.exit.Move('right');
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].updateBody('right');
+        }
+        for (var i = 0; i < game.trapList.length; i++) {
+            game.trapList[i].updateBody('right');
+        }
         //}
     }
 
     if (e.keyCode == "32") {
         game.player.jump(currentLevel);
     }
-	
-	//for testing purposes only
-	if(gameState == MENU && e.keyCode == "68")
-	{
-		//gameState = GAME;
-	}
-	
-}
+
+    //for testing purposes only
+    if (gameState == MENU && e.keyCode == "68") {
+        //gameState = GAME;
+    }
+
+};
 
 
 function destroyLevel() {
@@ -592,7 +646,9 @@ function destroyLevel() {
     delete game.player;
     game.world.DestroyBody(game.exit.body);
     delete game.exit;
-}
+};
+
+
 //Utilities
 /*function that provides access to request animation frame on all browsers */
 window.requestAnimFrame = (function () {
