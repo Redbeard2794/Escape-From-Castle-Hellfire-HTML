@@ -28,43 +28,46 @@ function Player()
 	this.SpriteWidth = 50;
 	this.SpriteHeight = 72;
 
-	//box2d body for level 1
-	this.fixDef = new b2FixtureDef;
-	this.fixDef.density = 1.0;
-	this.fixDef.friction = 0.5;
-	this.fixDef.restitution = 0.2;
+	if (game.currentLevel == 1) {
+	    //box2d body for level 1
+	    this.fixDef = new b2FixtureDef;
+	    this.fixDef.density = 1.0;
+	    this.fixDef.friction = 0.5;
+	    this.fixDef.restitution = 0.2;
 
-	this.bodyDef = new b2BodyDef;
-	this.bodyDef.type = b2Body.b2_dynamicBody;
-	this.bodyDef.userData = 'player';
-	this.bodyDef.owner = this;
-	this.fixDef.shape = new b2PolygonShape;
-	this.fixDef.shape.SetAsBox((this.SpriteWidth/ 30) /2, (this.SpriteHeight / 30) / 2);
-	this.bodyDef.position.x = 250 /30;
-	this.bodyDef.position.y = 100 /30;
+	    this.bodyDef = new b2BodyDef;
+	    this.bodyDef.type = b2Body.b2_dynamicBody;
+	    this.bodyDef.userData = 'player';
+	    this.bodyDef.owner = this;
+	    this.fixDef.shape = new b2PolygonShape;
+	    this.fixDef.shape.SetAsBox((this.SpriteWidth / 30) / 2, (this.SpriteHeight / 30) / 2);
+	    this.bodyDef.position.x = 250 / 30;
+	    this.bodyDef.position.y = 100 / 30;
 
-	this.body = game.world.CreateBody(this.bodyDef);
-	this.body.CreateFixture(this.fixDef);
-	this.body.SetFixedRotation(true);
-	
-	//box2d body for level 2
-	this.fixDef2 = new b2FixtureDef;
-	this.fixDef2.density = 1.0;
-	this.fixDef2.friction = 0.5;
-	this.fixDef2.restitution = 0.2;
-	
-	this.bodyDef2 = new b2BodyDef;
-	this.bodyDef2.type = b2Body.b2_dynamicBody;
-	this.bodyDef2.userData = 'player';
-	this.bodyDef2.owner = this;
-	this.fixDef2.shape = new b2PolygonShape;
-	this.fixDef2.shape.SetAsBox((this.horseSpriteWidth/ 30) /2, (this.horseSpriteHeight / 30) / 2);
-	this.bodyDef2.position.x = 200 /30;
-	this.bodyDef2.position.y = 100 /30;
+	    this.body = game.world.CreateBody(this.bodyDef);
+	    this.body.CreateFixture(this.fixDef);
+	    this.body.SetFixedRotation(true);
 
-	this.body2 = game.world.CreateBody(this.bodyDef2);
-	this.body2.CreateFixture(this.fixDef2);
-	this.body2.SetFixedRotation(true);
+	}
+	else if (game.currentLevel == 2) {//box2d body for level 2
+	    this.fixDef = new b2FixtureDef;
+	    this.fixDef.density = 1.0;
+	    this.fixDef.friction = 0.5;
+	    this.fixDef.restitution = 0.2;
+
+	    this.bodyDef = new b2BodyDef;
+	    this.bodyDef.type = b2Body.b2_dynamicBody;
+	    this.bodyDef.userData = 'player';
+	    this.bodyDef.owner = this;
+	    this.fixDef.shape = new b2PolygonShape;
+	    this.fixDef.shape.SetAsBox((this.horseSpriteWidth / 30) / 2, (this.horseSpriteHeight / 30) / 2);
+	    this.bodyDef.position.x = 200 / 30;
+	    this.bodyDef.position.y = 100 / 30;
+
+	    this.body = game.world.CreateBody(this.bodyDef);
+	    this.body.CreateFixture(this.fixDef);
+	    this.body.SetFixedRotation(true);
+	}
 	
     //for animating the sprites
 	this.currTime = Date.now();
@@ -76,6 +79,7 @@ function Player()
 	this.moving = false;
 	this.prevX = this.body.GetPosition();
 }
+
 
 Player.prototype.loadImages = function()
 {
@@ -184,25 +188,13 @@ Player.prototype.move = function(key)
     
 }
 
-Player.prototype.jump = function(currentLevel)
-{
-	if(currentLevel == 1)
-	{
-		if (!this.isJumping) {
-			var pos = this.body.GetPosition();
-			this.body.ApplyImpulse(new b2Vec2(0, 150), pos);
-			this.isJumping = true;
-		}
-	}
-	else if(currentLevel == 2)
-	{
-		if(!this.isJumping)
-		{
-			var pos = this.body2.getPosition();
-			this.body2.ApplyImpulse(new b2Vec2(0,150),pos);
-			this.isJumping = true;
-		}
-	}
+Player.prototype.jump = function (currentLevel) {
+    if (!this.isJumping) {
+        var pos = this.body.GetPosition();
+        this.body.ApplyImpulse(new b2Vec2(0, 175), pos);
+        this.isJumping = true;
+    }
+
 }
 Player.prototype.hit = function(impulse, entity)
 {
@@ -210,51 +202,45 @@ Player.prototype.hit = function(impulse, entity)
     {
         this.isJumping = false;
     }
-	else if(entity == "platform" && this.body2.GetLinearVelocity().y < 0)
-	{
-		this.isJumping = false;
-	}
+
 }
 
-Player.prototype.draw = function(currentLevel)
-{
-	if(currentLevel == 1)
-	{
-		var pos = this.body.GetPosition();
-		var angle = this.body.GetAngle();
+Player.prototype.draw = function (currentLevel) {
+    if (currentLevel == 1) {
+        var pos = this.body.GetPosition();
+        var angle = this.body.GetAngle();
 
-		game.ctx.save();
-		game.ctx.translate(pos.x * SCALE, pos.y * SCALE);
-		game.ctx.rotate(angle);
-		var scale = new b2Vec2(this.SpriteWidth / 2,this.SpriteHeight / 2);
-		game.ctx.scale(scale, scale);
-		if(this.currentSprite == this.spriteSheet && this.idle == false)
-			game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
-		else if (this.currentSprite == this.spriteSheetLeftWalk && this.idle == false)
-			game.ctx.drawImage(this.spriteSheetLeftWalk, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
-		else if (this.currentSprite == this.spriteSheetRightIdle && this.idle == true)
-			game.ctx.drawImage(this.spriteSheetRightIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
-		else if (this.currentSprite == this.spriteSheetLeftIdle && this.idle == true)
-			game.ctx.drawImage(this.spriteSheetLeftIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
-		game.ctx.restore();
-	}
-	
-	else if(currentLevel == 2)
-	{
-		var pos = this.body2.GetPosition();
-		var angle = this.body2.GetAngle();
-		
-		game.ctx.save();
-		game.ctx.translate(pos.x * SCALE, pos.y * SCALE);
-		game.ctx.rotate(angle);
-		
-		var scale = new b2Vec2(this.horseSpriteWidth / 2,this.horseSpriteHeight / 2);
-		game.ctx.scale(scale, scale);
-		
-		game.ctx.drawImage(this.horseSpriteSheet, this.sx, this.sy, this.horseSpriteWidth, 
+        game.ctx.save();
+        game.ctx.translate(pos.x * SCALE, pos.y * SCALE);
+        game.ctx.rotate(angle);
+        var scale = new b2Vec2(this.SpriteWidth / 2, this.SpriteHeight / 2);
+        game.ctx.scale(scale, scale);
+        if (this.currentSprite == this.spriteSheet && this.idle == false)
+            game.ctx.drawImage(this.spriteSheet, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
+        else if (this.currentSprite == this.spriteSheetLeftWalk && this.idle == false)
+            game.ctx.drawImage(this.spriteSheetLeftWalk, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
+        else if (this.currentSprite == this.spriteSheetRightIdle && this.idle == true)
+            game.ctx.drawImage(this.spriteSheetRightIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
+        else if (this.currentSprite == this.spriteSheetLeftIdle && this.idle == true)
+            game.ctx.drawImage(this.spriteSheetLeftIdle, this.sx, this.sy, this.SpriteWidth, this.SpriteHeight, -scale.x, -scale.y, this.SpriteWidth, this.SpriteHeight);
+        game.ctx.restore();
+    }
+
+    else if (currentLevel == 2) {
+        var pos = this.body.GetPosition();
+        var angle = this.body.GetAngle();
+
+        game.ctx.save();
+        game.ctx.translate(pos.x * SCALE, pos.y * SCALE);
+        game.ctx.rotate(angle);
+
+        var scale = new b2Vec2(this.horseSpriteWidth / 2, this.horseSpriteHeight / 2);
+        game.ctx.scale(scale, scale);
+
+        game.ctx.drawImage(this.horseSpriteSheet, this.sx, this.sy, this.horseSpriteWidth,
 			this.horseSpriteHeight, -scale.x, -scale.y, this.horseSpriteWidth, this.horseSpriteHeight);
-		
-		game.ctx.restore();
-	}
-	
+
+        game.ctx.restore();
+    }
+
 }

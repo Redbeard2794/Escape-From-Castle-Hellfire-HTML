@@ -1,7 +1,8 @@
 function proxTrap(Position) {
     this.sprite = new Image();
     this.sprite.src = 'textures/SpikeFallTrap1.png';
-
+    this.isFalling = false;
+    this.hasFallen = false;
     this.SpriteWidth = 53;
     this.SpriteHeight = 31;
 
@@ -26,10 +27,13 @@ function proxTrap(Position) {
 
 proxTrap.prototype.Trigger = function () {
     this.body.SetType(b2Body.b2_dynamicBody);
+    if (!this.hasFallen) { this.isFalling = true; this.hasFallen = true; }
 }
 
-proxTrap.prototype.hit = function () {
-
+proxTrap.prototype.hit = function (impulse, entity) {
+    if (entity == "platform") {
+        this.isFalling = false;
+    }
 }
 proxTrap.prototype.update = function (playerVelo) {
     if (playerVelo.x - this.body.GetLinearVelocity().x <= 0) {

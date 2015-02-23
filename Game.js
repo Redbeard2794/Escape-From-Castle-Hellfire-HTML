@@ -7,19 +7,14 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2, b2BodyDef = Box2D.Dynamics.b2BodyDef, b2B
 
 var SCALE = 30
 
-var url = "ws://127.0.0.1:8080";
+var url = "ws://149.153.102.20:8080/wstest";
 var ws = new WebSocket(url);
 
 var SPLASH = 0, MENU = 1, GAME = 2, MULTIPLAYER = 3;
 var gameState;
 
-var currentLevel = 1;
-
 ws.onopen = function () {
-    var msg = {}
-    msg.type = "join";
 
-    ws.send(JSON.stringify(msg));
 }
 ws.onmessage = function (evt) {
     message = JSON.parse(evt.data);
@@ -47,13 +42,16 @@ ws.onmessage = function (evt) {
 }
 ws.sendTrapMessage = function (posX, posY) {
     var msg = {};
-    msg.type = "updateTrap"
+    msg.type = "updateTrap";
     msg.data = {};
     msg.data.x = posX;
     msg.data.y = posY;
     ws.send(JSON.stringify(msg));
 };
-
+ws.sendTrapKillMessage = function () {
+    var msg = {};
+    msg.type = "trapHit";
+}
 
 function main() {
     game = new Game();
@@ -61,10 +59,10 @@ function main() {
     //listeners
     game.hitExit = false;
     game.menu = new Menu();
-    
+
 
     //load the platforms(for now)
-   
+
     //audio
     //http://gamedev.stackexchange.com/questions/60139/play-audio-in-javascript-with-a-good-performance
     //game.audio = document.createElement("audio");
@@ -83,34 +81,37 @@ function main() {
             PreSolve: function (contact, oldManifold) {
                 var bodyA = contact.GetFixtureA().GetBody();
                 var bodyB = contact.GetFixtureB().GetBody();
-                if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'exit' ||
-                    bodyA.GetUserData() == 'exit' && bodyB.GetUserData() == 'player')
-                {
+                if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'exit' ||
+                    bodyA.GetUserData() == 'exit' && bodyB.GetUserData() == 'player') {
                     if (!game.hitExit) {
-                        currentLevel++;
+                        game.currentLevel++;
                         game.hitExit = true;
                     }
                     else {
                         contact.SetEnabled(false);
                     }
                 }
-                else if(bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'ground' ||
-                    bodyA.GetUserData() == 'ground' && bodyB.GetUserData() == 'player')
-                {
-                    if(!game.hitExit){
+                else if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'ground' ||
+                    bodyA.GetUserData() == 'ground' && bodyB.GetUserData() == 'player') {
+                    if (!game.hitExit) {
                         game.hitExit = true;
-                        game.deaths+=1;
+                        game.deaths += 1;
                     }
-                    else{
+                    else {
                         contact.SetEnabled(false);
                     }
-                    
+
                 }
             },
             PostSolve: function (bodyA, bodyB, impulse) {
-                if (impulse < 0.1) { return; } // playing with thresholds
+                //if (impulse < 0.1) { return; } // playing with thresholds
                 if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'platform' ||
                     bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'player') {
+                    bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
+                    bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
+                }
+                else if (bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform' ||
+                    bodyA.GetUserData() == 'platform' && bodyB.GetUserData() == 'proxtrap') {
                     bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
                     bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
                 }
@@ -119,27 +120,35 @@ function main() {
 
                 }
                 else if (bodyA.GetUserData() == 'player' && bodyB.GetUserData() == 'proxtrap' ||
-                    bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'platform') {
-                    bodyA.GetOwner().hit(impulse, bodyB.GetUserData());
-                    bodyB.GetOwner().hit(impulse, bodyA.GetUserData());
-                } 
+                    bodyA.GetUserData() == 'proxtrap' && bodyB.GetUserData() == 'player') {
 
+                    var trapBod = (bodyA.GetUserData() == 'player') ? bodyB : bodyA;
 
-                
+                    if (gameState == GAME) {
+                        if (trapBod.GetOwner().isFalling) {
+                            if (!game.hitExit) {
+                                game.hitExit = true;
+                                game.deaths += 1;
+                            }
+                        }
+                    }
+                    else if (gameState == MULTIPLAYER) {
+                        ws.sendTrapKillMessage();
+                    }
+                }
             }
-
         });
 
     gameState = SPLASH;
     //stuff for UI(May move it somewhere else after)
-    
+
 
     game.background = new Image();
     game.background.src = 'textures/level1Background.png';
-	
-	game.splash = new Image();
-	game.splash.src = 'textures/SplashScreen.png';
-	
+
+    game.splash = new Image();
+    game.splash.src = 'textures/SplashScreen.png';
+
     game.timer = 0;
     game.secTimer = 0;
 
@@ -147,9 +156,9 @@ function main() {
 
     game.debug();
 
-    document.addEventListener("mousedown", function(e){game.Clicked(e);});
+    document.addEventListener("mousedown", function (e) { game.Clicked(e); });
 
-	
+
     requestAnimFrame(game.update); //kickoff the update cycle
 }
 
@@ -184,52 +193,49 @@ Game.prototype.Clicked = function (e) {
         game.spawnTrap(e.clientX, e.clientY);
     }
 }
-Game.prototype.spawnTrap = function(posX,posY)
-{
+Game.prototype.spawnTrap = function (posX, posY) {
     var trap = new proxTrap(new b2Vec2(posX, posY));
     game.trapList[game.trapList.length] = trap;
 
-    ws.sendTrapMessage(posX,posY);
+    ws.sendTrapMessage(posX, posY);
 }
 
 
 function loadLevel(plats) {
     //loads from external xml file
-	console.log(currentLevel);
-	if(currentLevel == 1)
-	{
-	    xmlDoc = loadXMLDoc("levels/Level1.xml");
-	    game.numPlatforms = 18;
-	    game.player = new Player();
-	    game.trapList = [];
+    console.log(game.currentLevel);
+    if (game.currentLevel == 1) {
+        xmlDoc = loadXMLDoc("levels/Level1.xml");
+        game.numPlatforms = 18;
+        game.player = new Player();
+        game.trapList = [];
         game.platforms = [];
-	    game.exit = new Exit(2320, 5);
+        game.exit = new Exit(2320, 5);
 
-	    var trap1 = new proxTrap(new b2Vec2(450, 0));
-	    var trap2 = new proxTrap(new b2Vec2(1080, 0));
-	    var trap3 = new proxTrap(new b2Vec2(1220, 0));
+        var trap1 = new proxTrap(new b2Vec2(450, 0));
+        var trap2 = new proxTrap(new b2Vec2(1080, 0));
+        var trap3 = new proxTrap(new b2Vec2(1220, 0));
 
-	    
-	    game.trapList[game.trapList.length] = trap2;
-	    game.trapList[game.trapList.length] = trap3;
-	}
-	else if(currentLevel == 2)
-	{
-	    xmlDoc = loadXMLDoc("levels/Level2.xml");
-	    game.numPlatforms = 18;
-	    game.player = new Player();
-	    game.trapList = [];
+        game.trapList[game.trapList.length] = trap1;
+        game.trapList[game.trapList.length] = trap2;
+        game.trapList[game.trapList.length] = trap3;
+    }
+    else if (game.currentLevel == 2) {
+        xmlDoc = loadXMLDoc("levels/Level2.xml");
+        game.numPlatforms = 18;
+        game.player = new Player();
+        game.trapList = [];
         game.platforms = [];
-	    game.exit = new Exit(2550, 100);
+        game.exit = new Exit(2550, 100);
 
-	    var trap1 = new proxTrap(new b2Vec2(450, 0));
-	    var trap2 = new proxTrap(new b2Vec2(1080, 0));
-	    var trap3 = new proxTrap(new b2Vec2(1220, 0));
+        var trap1 = new proxTrap(new b2Vec2(450, 0));
+        var trap2 = new proxTrap(new b2Vec2(1080, 0));
+        var trap3 = new proxTrap(new b2Vec2(1220, 0));
 
-	    game.trapList[game.trapList.length] = trap1;
-	    game.trapList[game.trapList.length] = trap2;
-	    game.trapList[game.trapList.length] = trap3;
-	}
+        game.trapList[game.trapList.length] = trap1;
+        game.trapList[game.trapList.length] = trap2;
+        game.trapList[game.trapList.length] = trap3;
+    }
     for (var i = 0; i < game.numPlatforms; i++) {
         var x;
         var y;
@@ -239,26 +245,24 @@ function loadLevel(plats) {
 
         game.platforms[game.platforms.length] = new Platform(x, y);
     }
-   
+
     game.hitExit = false;
 }
 
 //for loading from an external xml file
 //source: http://www.w3schools.com/dom/dom_loadxmldoc.asp
-function loadXMLDoc(filename)
-{
-    if (window.XMLHttpRequest)
-      {
-		xhttp=new XMLHttpRequest();
-      }
+function loadXMLDoc(filename) {
+    if (window.XMLHttpRequest) {
+        xhttp = new XMLHttpRequest();
+    }
     else // code for IE5 and IE6(of course IE has to be different!)
-      {
-		xhttp=new ActiveXObject("Microsoft.XMLHTTP");
-      }
-    xhttp.open("GET",filename,false);
+    {
+        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xhttp.open("GET", filename, false);
     xhttp.send();
     return xhttp.responseXML;
-} 
+}
 
 function init() {
     //setTimeout(function () { game.player.loadImages() }, 2000);
@@ -305,6 +309,8 @@ function Game() {
     //initializations
     this.initCanvas();
     this.initTouch();
+
+    this.currentLevel = 1;
 
 };
 
@@ -375,11 +381,12 @@ Game.prototype.update = function () {
         if (game.hitExit) {
             destroyLevel();
             loadLevel();
+            game.hitExit = false;
         }
         game.checkTraps();
 
         game.exit.update(game.player.body.GetLinearVelocity());
-        game.player.update(currentLevel);
+        game.player.update(game.currentLevel);
 
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].update(game.player.body.GetLinearVelocity());
@@ -399,7 +406,11 @@ Game.prototype.update = function () {
 
 
     game.draw();
-    //game.world.DrawDebugData();
+
+    //if (gameState == GAME) {
+    //    game.world.DrawDebugData();
+    //}
+    //else { game.draw(); }
 
     requestAnimFrame(game.update);
 };
@@ -455,7 +466,7 @@ Game.prototype.draw = function () {
                 console.log("Right arrow touched");
             }
             else if (touch.clientX > 190 && touch.clientX < 678 && touch.clientY > 395 && touch.clientY < 479) {
-                game.player.jump(currentLevel);
+                game.player.jump(game.currentLevel);
                 //game.audio.play();
             }
         }
@@ -464,21 +475,28 @@ Game.prototype.draw = function () {
 			&& touch.clientY > game.menu.playButtonY && touch.clientY < game.menu.playButtonY + game.menu.buttonHeight) {
                 gameState = GAME;
                 console.log("Play button touched");
-            }
-
-            if (touch.clientX > game.menu.multiplayerButtonX && touch.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
-			&& touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
-                console.log("multiplayer button touched");
-            }
-
-            if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
-			&& touch.clientY > game.menu.optionsButtonY && touch.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) {
-                console.log("options button touched");
+                console.log("Changing gameState to GAME");
+                gameState = GAME;
+                game.setUpSinglePlayer();
             }
         }
+
+        if (touch.clientX > game.menu.multiplayerButtonX && touch.clientX < game.menu.multiplayerButtonX + game.menu.buttonWidth
+        && touch.clientY > game.menu.multiplayerButtonY && touch.clientY < game.menu.multiplayerButtonY + game.menu.buttonHeight) {
+            console.log("multiplayer button touched");
+            console.log("Multiplayer arriving now");
+            gameState = MULTIPLAYER;
+            game.setUpMultiplayer();
+        }
+
+        if (touch.clientX > game.menu.optionsButtonX && touch.clientX < game.menu.optionsButtonX + game.menu.buttonWidth
+        && touch.clientY > game.menu.optionsButtonY && touch.clientY < game.menu.optionsButtonY + game.menu.buttonHeight) {
+            console.log("options button touched");
+        }
+
         else if (gameState == SPLASH) {
             if (touch.clientX > 0 && touch.clientX < 800
-			&& touch.clientY > 0 && touch.clientY < 800) {
+            && touch.clientY > 0 && touch.clientY < 800) {
                 gameState = MENU;
             }
         }
@@ -524,7 +542,7 @@ Game.prototype.draw = function () {
         this.ctx.fillText("Time: " + game.timer, 25, 30);
         this.ctx.fillText("Deaths: " + game.deaths, 25, 60)
 
-        game.player.draw(currentLevel);
+        game.player.draw(game.currentLevel);
     }
     else if (gameState == MENU) {
         game.menu.draw();
@@ -559,7 +577,10 @@ Game.prototype.setUpSinglePlayer = function () {
 };
 
 Game.prototype.setUpMultiplayer = function () {
+    var msg = {}
+    msg.type = "join";
 
+    ws.send(JSON.stringify(msg));
 };
 
 function onTouchMove(e) {
@@ -579,7 +600,7 @@ function onTouchEnd(e) {
 
 function keyDownHandler(e) {
 
-    if (currentLevel == 1) {
+    if (game.currentLevel == 1) {
         if (e.keyCode == "68")//up 38, 87 D
         {
             game.player.move('right');
@@ -605,7 +626,7 @@ function keyDownHandler(e) {
         }
     }
 
-    else if (currentLevel == 2) {
+    else if (game.currentLevel == 2) {
         //if (e.keyCode == "68")//up 38, 87 D
         //{
         game.player.move('right');
@@ -620,7 +641,7 @@ function keyDownHandler(e) {
     }
 
     if (e.keyCode == "32") {
-        game.player.jump(currentLevel);
+        game.player.jump(game.currentLevel);
     }
 
     //for testing purposes only
@@ -647,7 +668,6 @@ function destroyLevel() {
     game.world.DestroyBody(game.exit.body);
     delete game.exit;
 };
-
 
 //Utilities
 /*function that provides access to request animation frame on all browsers */
