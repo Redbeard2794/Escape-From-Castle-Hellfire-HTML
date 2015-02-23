@@ -31,18 +31,18 @@ ws.onmessage = function (evt) {
         console.log("GF");
     }
     else if (message.type == "updateState") {
-        setPlayerPos(message.X, message.Y);
+       // setPlayerPos(message.X, message.Y);
     }
     else if (message.type == "level clear") {
-        endLevel();
+       // endLevel();
     }
     else if (message.type == "death") {
-        updateDeathCount();
+       // updateDeathCount();
     }
 }
 ws.sendTrapMessage = function (posX, posY) {
     var msg = {};
-    msg.type = "updateTrap";
+    msg.type = "placeTrap";
     msg.data = {};
     msg.data.x = posX;
     msg.data.y = posY;
@@ -226,7 +226,7 @@ function loadLevel(plats) {
         game.player = new Player();
         game.trapList = [];
         game.platforms = [];
-        game.exit = new Exit(2550, 100);
+        game.exit = new Exit(1950, 200);
 
     }
     for (var i = 0; i < game.numPlatforms; i++) {
@@ -386,6 +386,7 @@ Game.prototype.update = function () {
         }
         for (var i = 0; i < game.trapList.length; i++) {
             game.trapList[i].update(game.player.body.GetLinearVelocity());
+
         }
         if (game.secTimer < 60) {
             game.secTimer += 1;
@@ -537,6 +538,45 @@ Game.prototype.draw = function () {
 
         game.player.draw(game.currentLevel);
     }
+    else if (gameState == MULTIPLAYER) {
+        this.ctx.save();
+        this.ctx.translate(-200, 0);
+        this.ctx.drawImage(game.background, 0, 0, 3499, 479);
+        this.ctx.restore();
+
+        //var playerPos = game.player.body.GetPosition();
+
+        for (var i = 0; i < game.numPlatforms; i++) {
+            game.platforms[i].draw();
+        }
+        for (var i = 0; i < game.trapList.length; i++) {
+            game.trapList[i].draw();
+        }
+        game.exit.draw();
+
+        this.ctx.save();
+        this.ctx.translate(game.jumpX, game.jumpY);
+        this.ctx.drawImage(game.jumpButton, 0, 0, 298, 57);
+        this.ctx.restore();
+
+
+        this.ctx.save();
+        this.ctx.translate(game.leftArrowX, game.leftArrowY);
+        this.ctx.drawImage(game.leftArrow, 0, 0, 178, 84);
+        this.ctx.restore();
+
+        this.ctx.save();
+        this.ctx.translate(game.rightArrowX, game.rightArrowY);
+        this.ctx.drawImage(game.rightArrow, 0, 0, 178, 84);
+        this.ctx.restore();
+
+
+        this.ctx.font = "30px Arial";
+        this.ctx.fillText("Time: " + game.timer, 25, 30);
+        this.ctx.fillText("Deaths: " + game.deaths, 25, 60)
+
+        game.player.draw(game.currentLevel);
+    }
     else if (gameState == MENU) {
         game.menu.draw();
     }
@@ -622,7 +662,7 @@ function keyDownHandler(e) {
     else if (game.currentLevel == 2) {
         //if (e.keyCode == "68")//up 38, 87 D
         //{
-        game.player.move('right');
+        //game.player.move('right');
         game.exit.Move('right');
         for (var i = 0; i < game.numPlatforms; i++) {
             game.platforms[i].updateBody('right');
